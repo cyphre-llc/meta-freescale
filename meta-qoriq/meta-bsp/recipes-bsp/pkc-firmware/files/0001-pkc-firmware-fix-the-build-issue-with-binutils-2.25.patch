@@ -1,0 +1,67 @@
+From 934332179ac4d2e76dc45e16555e173d3c175c66 Mon Sep 17 00:00:00 2001
+From: Chunrong Guo <B40290@freescale.com>
+Date: Mon, 20 Apr 2015 00:53:25 -0500
+Subject: [PATCH] pkc-firmware: fix the build issue with binutils-2.25
+
+   Fixed the following build errors with binutils-2.25:
+  | powerpc-poky-linux-gnuspe-ld.bfd: _GLOBAL_OFFSET_TABLE_ not defined in linker created .got
+
+Signed-off-by: Zhenhua Luo <zhenhua.luo@freescale.com>
+---
+ arch/powerpc/cpu/mpc85xx/u-boot-nand.lds     | 1 -
+ arch/powerpc/cpu/mpc85xx/u-boot-nand_spl.lds | 1 -
+ arch/powerpc/cpu/mpc85xx/u-boot.lds          | 1 -
+ c2x0_boot_loader/u-boot.lds                  | 1 -
+ 4 files changed, 4 deletions(-)
+
+diff --git a/arch/powerpc/cpu/mpc85xx/u-boot-nand.lds b/arch/powerpc/cpu/mpc85xx/u-boot-nand.lds
+index 8ba9399..2d16a58 100644
+--- a/arch/powerpc/cpu/mpc85xx/u-boot-nand.lds
++++ b/arch/powerpc/cpu/mpc85xx/u-boot-nand.lds
+@@ -54,7 +54,6 @@ SECTIONS
+     _GOT2_TABLE_ = .;
+     KEEP(*(.got2))
+     KEEP(*(.got))
+-    PROVIDE(_GLOBAL_OFFSET_TABLE_ = . + 4);
+     _FIXUP_TABLE_ = .;
+     KEEP(*(.fixup))
+   }
+diff --git a/arch/powerpc/cpu/mpc85xx/u-boot-nand_spl.lds b/arch/powerpc/cpu/mpc85xx/u-boot-nand_spl.lds
+index 668158f..c3c12ef 100644
+--- a/arch/powerpc/cpu/mpc85xx/u-boot-nand_spl.lds
++++ b/arch/powerpc/cpu/mpc85xx/u-boot-nand_spl.lds
+@@ -38,7 +38,6 @@ SECTIONS
+ 		_GOT2_TABLE_ = .;
+ 		KEEP(*(.got2))
+ 		KEEP(*(.got))
+-		PROVIDE(_GLOBAL_OFFSET_TABLE_ = . + 4);
+ 		_FIXUP_TABLE_ = .;
+ 		KEEP(*(.fixup))
+ 	}
+diff --git a/arch/powerpc/cpu/mpc85xx/u-boot.lds b/arch/powerpc/cpu/mpc85xx/u-boot.lds
+index efe34b7..51402d1 100644
+--- a/arch/powerpc/cpu/mpc85xx/u-boot.lds
++++ b/arch/powerpc/cpu/mpc85xx/u-boot.lds
+@@ -61,7 +61,6 @@ SECTIONS
+     _GOT2_TABLE_ = .;
+     KEEP(*(.got2))
+     KEEP(*(.got))
+-    PROVIDE(_GLOBAL_OFFSET_TABLE_ = . + 4);
+     _FIXUP_TABLE_ = .;
+     KEEP(*(.fixup))
+   }
+diff --git a/c2x0_boot_loader/u-boot.lds b/c2x0_boot_loader/u-boot.lds
+index a8e3d35..41561d7 100644
+--- a/c2x0_boot_loader/u-boot.lds
++++ b/c2x0_boot_loader/u-boot.lds
+@@ -61,7 +61,6 @@ SECTIONS
+     _GOT2_TABLE_ = .;
+     KEEP(*(.got2))
+     KEEP(*(.got))
+-    PROVIDE(_GLOBAL_OFFSET_TABLE_ = . + 4);
+     _FIXUP_TABLE_ = .;
+     KEEP(*(.fixup))
+   }
+--
+2.3.3
+

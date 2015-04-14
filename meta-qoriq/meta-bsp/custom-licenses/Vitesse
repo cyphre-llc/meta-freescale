@@ -1,0 +1,30 @@
+This package contains firmware required by the Vitesse VSC7385 Gigabit Switch
+device on the MPC8313ERDB board.  The firmware is stored as a binary image in the
+file called "vsc2bin".  The firmware is loaded to the VSC7385 device that 
+contains a standalone processor.  The VSC7385 firmware runs independently of
+the main processor subsystem and software within the MPC8313ERDB board.
+Once loaded and started the VSC7385 has no interaction with the software
+system from which it was loaded.
+
+The software within this packages has the following copyright and software
+license agreement:
+
+Copyright (c) 2004, 2006 Vitesse Semiconductor Corporation "Vitesse".
+All Rights Reserved. Unpublished rights reserved under the copyright laws
+of the United States of America, other countries and international
+treaties. The software is provided without a fee. Permission to use, copy,
+and store is granted. Permission to integrate into other products,
+disclose, transmit and distribute the software in an absolute machine
+readable format (e.g. HEX file) is also granted. 
+
+This software has been provided "As is", without express or implied
+warranty including, without limitation, implied warranties of
+merchantability, fitness for a particular use and non-infringement.
+Vitesse retains all ownership, copyright, trade secret and proprietary
+rights in the software.
+
+For any detail information about license, please contact:
+Michel Thorsen	Vitesse Semiconductor Corps. Hoerkaer 16, Denmark
+Telephone +45 44 85 59 42, E-mail: mvt@vitesse.com
+Tony Tam Freescale Semiconductor 8133 Warden Avenue Markharn, Ontario, Canada L6G 1B3
+Telephone:905-948-5443	Fax:	E-mail: Tony.Tam@freescale.com

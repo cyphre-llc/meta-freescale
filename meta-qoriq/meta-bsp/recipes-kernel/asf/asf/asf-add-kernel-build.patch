@@ -1,0 +1,11 @@
+--- a/Makefileold	2015-04-13 02:54:32.246678676 -0500
++++ b/Makefile	2015-04-13 02:55:07.678677412 -0500
+@@ -9,7 +9,7 @@
+ TOPDIR := $(shell pwd)
+ export TOPDIR
+ 
+-include $(KERNEL_PATH)/.config
++include $(KERNEL_BUILDDIR)/.config
+ include asfconfig.mk
+ ifeq ($(CONFIG_AS_FASTPATH), y)
+ #------------------------------------------------------------------------------
