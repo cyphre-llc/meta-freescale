@@ -1,0 +1,376 @@
+#!/bin/sh
+# -*- mode: shell-script; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
+#
+# Copyright (C) 2012, 2013 O.S. Systems Software LTDA.
+# Authored-by:  Otavio Salvador <otavio@ossystems.com.br>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#
+# Add options for the script
+# Copyright (C) 2013-2015 Freescale Semiconductor, Inc.
+
+# Check if current user is root
+if [ "$(whoami)" = "root" ]; then
+    echo "ERROR: Do not use the BSP as root. Exiting..."
+    return
+fi
+
+ROOTDIR="`readlink -f $BASH_SOURCE | xargs dirname`"
+PROGNAME="fsl-setup-env"
+
+if [ -z "$ZSH_NAME" ] && echo "$0" | grep -q "$PROGNAME"; then
+    echo "ERROR: This script needs to be sourced."
+    SCRIPT_PATH=`readlink -f $0`
+    if [ "`readlink $SHELL`" = "dash" ];then
+        echo "Try run command \"set -- -h; . $SCRIPT_PATH\" to get help."
+    else
+        echo "Try run command \". $SCRIPT_PATH -h\" to get help."
+    fi
+    unset SCRIPT_PATH ROOTDIR PROGNAME
+    return
+else
+    OEROOTDIR=${ROOTDIR}/sources/poky
+    if [ -e ${ROOTDIR}/sources/oe-core ]; then
+        OEROOTDIR=${ROOTDIR}/sources/oe-core
+    fi
+fi
+
+prompt_message ()
+{
+echo "Welcome to Freescale Community BSP
+
+The Yocto Project has extensive documentation about OE including a
+reference manual which can be found at:
+    http://yoctoproject.org/documentation
+
+For more information about OpenEmbedded see their website:
+    http://www.openembedded.org/
+
+You can now run 'bitbake <target>'
+
+Common targets are:
+    core-image-minimal
+    meta-toolchain
+    meta-toolchain-sdk
+    adt-installer
+    meta-ide-support
+"
+
+    echo "To return to this build environment later please run:"
+    echo "    . $PROJECT_DIR/SOURCE_THIS"
+}
+
+clean_up()
+{
+   unset LIST_IMX_MACHINES LIST_QORIQ_MACHINES VALID_IMX_MACHINE \
+         VALID_QORIQ_MACHINE ROOTDIR PROJECT_DIR DOWNLOADS CACHES \
+         EULA EULA_FILE PROGNAME LAYER_LIST MACHINE DISTRO OEROOTDIR \
+         OLD_OPTIND OPTIND CPUS JOBS THREADS \
+         setup_h setup_j setup_t setup_l setup_builddir setup_mirrors \
+         setup_string setup_mirror setup_download setup_sstate \
+         setup_error append_layer
+   unset -f usage prompt_message
+}
+
+usage()
+{
+    echo "Usage: source $PROGNAME -m <machine>"
+
+    ls sources/meta-freescale/*/meta-bsp/conf/machine/*.conf > /dev/null 2>&1
+
+    if [ $? -eq 0 ]; then
+        echo -e "\n    Supported machines
+    i.MX:  `ls sources/meta-freescale/meta-imx/meta-bsp/conf/machine \
+| grep "\.conf" | sed s/\.conf//g | xargs echo`
+    QorIQ: `ls sources/meta-freescale/meta-qoriq/meta-bsp/conf/machine \
+| grep "\.conf" | sed s/\.conf//g | xargs echo`
+"
+    else
+        echo "    ERROR: no available machine conf file is found. "
+    fi
+
+    echo "    Optional parameters:
+    * [-m machine]: the target machine to be built.
+    * [-b path]:    non-default path of project build folder. 
+    * [-j jobs]:    number of jobs for make to spawn during the compilation stage.
+    * [-t tasks]:   number of BitBake tasks that can be issued in parallel.
+    * [-d path]:    non-default path of DL_DIR (downloaded source)
+    * [-c path]:    non-default path of SSTATE_DIR (shared state Cache)
+    * [-b path]:    non-default path of project folder (build_\${machine}_release)
+    * [-s string]:  append an extra string to project folder
+    * [-l]:         lite mode. To help conserve disk space, deletes the building 
+                    directory once the package is built.
+    * [-p]:         use fsl internal cache mirrors (FSL Internal Use Only)
+    * [-h]:         help
+"
+    if [ "`readlink $SHELL`" = "dash" ];then
+        echo "                                                                                                                          
+    You are using dash which not pass args when being sourced.
+    To workaround this limitation, use \"set -- args\" prior to
+    sourcing this script. For exmaple:
+        \$ set -- -m p4080ds -j 3 -t 2
+        \$ . $OEROOTDIR/$PROGNAME
+"
+    fi
+}
+
+# parse the parameters
+OLD_OPTIND=$OPTIND
+while getopts "m:j:t:s:b:d:c:lph" setup_flag
+do
+    case $setup_flag in
+        m) MACHINE="$OPTARG";
+           ;;
+        j) setup_j="$OPTARG";
+           ;;
+        t) setup_t="$OPTARG";
+           ;;
+        b) setup_builddir="$OPTARG";
+           ;;
+        s) setup_string="$OPTARG";
+           ;;
+        d) setup_download="$OPTARG";
+           ;;
+        c) setup_sstate="$OPTARG";
+           ;;
+        l) setup_l='true';
+           ;;  
+        p) setup_mirrors='true';
+           ;;
+        h) setup_h='true';
+           ;;
+        ?) setup_error='true';
+           ;;
+    esac
+done
+OPTIND=$OLD_OPTIND                                                                                                                      
+
+# check the "-h" and other not supported options
+if test $setup_error || test $setup_h; then
+    usage && clean_up && return
+fi
+
+if [ -z "$MACHINE" ]; then
+    echo "ERROR: Please specify an invalid machine!"
+    usage && clean_up && return
+fi
+
+# Check the machine type specified
+LIST_IMX_MACHINES=`ls -1 $ROOTDIR/sources/meta-freescale/meta-imx/meta-bsp/conf/machine`
+LIST_QORIQ_MACHINES=`ls -1 $ROOTDIR/sources/meta-freescale/meta-qoriq/meta-bsp/conf/machine`
+VALID_IMX_MACHINE=`echo -e "$LIST_IMX_MACHINES" | grep ${MACHINE}.conf$ | wc -l`
+VALID_QORIQ_MACHINE=`echo -e "$LIST_QORIQ_MACHINES" | grep ${MACHINE}.conf$ | wc -l`
+if [ "x$MACHINE" = "x" ] || [ "$VALID_IMX_MACHINE" = "0" ] && [ "$VALID_QORIQ_MACHINE" = "0" ]; then
+    echo -e "\nThe \$MACHINE you have specified ($MACHINE) is not supported by this build setup."
+    usage && clean_up && return
+else
+    echo "Configuring for ${MACHINE} ..."
+fi
+
+LAYER_LIST=" \
+    meta-openembedded/meta-oe \
+    meta-openembedded/meta-multimedia \
+    meta-openembedded/meta-gnome \
+    meta-openembedded/meta-networking \
+    meta-openembedded/meta-python \
+    meta-openembedded/meta-filesystems \
+    \
+    meta-freescale/common \
+    \
+    meta-freescale/meta-imx/meta-bsp \
+    meta-freescale/meta-imx/meta-oe \
+    meta-freescale/meta-imx/meta-qt \
+    \
+    meta-freescale/meta-qoriq/meta-bsp \
+    meta-freescale/meta-qoriq/meta-toolchain \
+    \
+    meta-qt5 \
+    meta-fsl-demos \
+    meta-browser \
+    meta-virtualization \
+"
+
+if [ "$VALID_IMX_MACHINE" != "0" ]; then
+    DISTRO="poky"
+    EULA_FILE="$ROOTDIR/sources/meta-freescale/meta-imx/license/EULA"
+elif [ "$VALID_QORIQ_MACHINE" != "0" ]; then
+    DISTRO='fsl-qoriq'
+    EULA_FILE="$ROOTDIR/sources/meta-freescale/meta-qoriq/meta-bsp/custom-licenses/Freescale-EULA"
+fi
+
+# set default jobs and threads
+CPUS=`grep -c processor /proc/cpuinfo`
+JOBS="4"
+THREADS="4"
+
+# check optional jobs and threads
+if echo "$setup_j" | egrep -q "^[0-9]+$"; then
+    JOBS=$setup_j
+fi                                                                                                                                      
+if echo "$setup_t" | egrep -q "^[0-9]+$"; then
+    THREADS=$setup_t
+fi
+
+# set project folder location and name
+if test $setup_builddir; then
+    PROJECT_DIR=`pwd`/${setup_builddir}
+else                                                                                                                                    
+    PROJECT_DIR=`pwd`/build_${MACHINE}
+fi
+
+if test $setup_string; then
+    PROJECT_DIR="${PROJECT_DIR}_${setup_string}"
+fi
+
+if test $setup_download; then
+    DOWNLOADS="$setup_download"
+else
+    DOWNLOADS="$ROOTDIR/downloads"
+fi
+mkdir -p $DOWNLOADS
+DOWNLOADS=`readlink -f "$DOWNLOADS"`
+
+if test $setup_sstate; then
+    CACHES="$setup_sstate"
+else
+    CACHES="$ROOTDIR/sstate-cache"
+fi
+mkdir -p $CACHES
+CACHES=`readlink -f "$CACHES"`
+
+# source oe-init-build-env to init build env
+cd $OEROOTDIR
+set -- $PROJECT_DIR
+. ./oe-init-build-env > /dev/null
+
+# if conf/local.conf not generated, no need to go further
+if [ ! -e conf/local.conf ]; then
+    echo "ERROR: the local.conf is not created, Exit ..."
+    clean_up && return
+fi
+
+# Remove comment lines and empty lines
+sed -i -e '/^#.*/d' -e '/^$/d' conf/local.conf
+
+# Clean up PATH, because if it includes tokens to current directories somehow,
+# wrong binaries can be used instead of the expected ones during task execution
+export PATH="`echo $PATH | sed 's/\(:.\|:\)*:/:/g;s/^.\?://;s/:.\?$//'`"
+
+# add layers
+for layer in $(eval echo $LAYER_LIST); do
+    append_layer=""
+    if [ -e ${ROOTDIR}/sources/${layer} ]; then
+        append_layer="${ROOTDIR}/sources/${layer}"
+    fi
+    if [ -n "${append_layer}" ]; then
+        append_layer=`readlink -f $append_layer`
+        awk '/  \"/ && !x {print "'"  ${append_layer}"' \\"; x=1} 1' \
+            conf/bblayers.conf > conf/bblayers.conf~
+        mv conf/bblayers.conf~ conf/bblayers.conf
+    fi
+done
+
+cat >> conf/local.conf <<-EOF
+
+# Machine and distro setting
+MACHINE ?= "$MACHINE"
+DISTRO = "$DISTRO"
+# Parallelism Options
+BB_NUMBER_THREADS = "$THREADS"
+PARALLEL_MAKE = "-j $JOBS"
+DL_DIR = "$DOWNLOADS"
+SSTATE_DIR = "$CACHES"
+EOF
+
+for s in $HOME/.oe $HOME/.yocto; do
+    if [ -e $s/site.conf ]; then
+        echo "Linking $s/site.conf to conf/site.conf"
+        ln -s $s/site.conf conf
+    fi
+done
+
+# setup fsl private mirrors
+if [ ! -z "$setup_mirrors" ];then
+    cat >> conf/local.conf <<-EOF
+# sstate-cache mirrors
+SSTATE_MIRRORS += "file:///(.*)/(.*) http://nas101.am.freescale.net/yocto/sstate-cache/\\1/\\2 \\n"
+SSTATE_MIRRORS += "file:///.*/(.*)/(.*) http://nas101.am.freescale.net/yocto/sstate-cache/native/\\1/\\2 \\n"
+EOF
+fi
+
+# option to enable lite mode for now
+if test $setup_l; then
+    echo "# delete sources after build" >> conf/local.conf
+    echo "INHERIT += \"rm_work\"" >> conf/local.conf
+    echo >> conf/local.conf
+fi
+
+if echo "$MACHINE" |egrep -q "^(b4|p5|t1|t2|t4)"; then
+    # disable prelink (for multilib scenario) for now
+    sed -i s/image-mklibs.image-prelink/image-mklibs/g conf/local.conf
+fi
+
+# Handle EULA setting
+if [ -z "$EULA" ] && ! grep -q '^ACCEPT_FSL_EULA\s*=' conf/local.conf; then
+    EULA='ask'
+fi
+
+if [ "$EULA" = "ask" ]; then
+    cat <<EOF
+
+Some BSPs depend on libraries and packages which are covered by Freescale's
+End User License Agreement (EULA). To have the right to use these binaries in
+your images, you need to read and accept the following...
+
+EOF
+
+    sleep 3
+
+    more -d $EULA_FILE
+    echo
+    while [ "$EULA" = "ask" ]; do
+        echo -n "Do you accept the EULA you just read? (y/n) "
+        read REPLY
+        case "$REPLY" in
+            y|Y)
+            echo "EULA has been accepted."
+            EULA="1"
+            ;;
+            n|N)
+            echo "EULA has not been accepted."
+            EULA="0"
+            ;;
+        esac
+    done
+fi
+
+if grep -q '^ACCEPT_FSL_EULA\s*=' conf/local.conf; then
+    sed -i "s/^#*ACCEPT_FSL_EULA\s*=.*/ACCEPT_FSL_EULA = \"$EULA\"/g" conf/local.conf
+else
+    echo "ACCEPT_FSL_EULA = \"$EULA\"" >> conf/local.conf
+fi
+
+# make a SOURCE_THIS file
+if [ ! -e SOURCE_THIS ]; then
+    echo "#!/bin/sh" >> SOURCE_THIS
+    echo $OEROOTDIR
+    echo "cd $OEROOTDIR" >> SOURCE_THIS
+    echo "set -- $PROJECT_DIR" >> SOURCE_THIS
+    echo ". ./oe-init-build-env > /dev/null" >> SOURCE_THIS
+    echo "echo \"Back to build project $PROJECT_DIR.\"" >> SOURCE_THIS
+fi
+
+prompt_message
+cd $PROJECT_DIR
+clean_up 
