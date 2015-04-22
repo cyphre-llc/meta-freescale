@@ -57,7 +57,6 @@ IMAGE_INSTALL += " \
     ${@multilib_pkg_extend(d, "g++")} \
     ${@multilib_pkg_extend(d, "gcc")} \
     ${@multilib_pkg_extend(d, "gcov")} \
-    ${@multilib_pkg_extend(d, "libgcov-dev")} \
     ${@multilib_pkg_extend(d, "ldd")} \
     ${@multilib_pkg_extend(d, "libgcc")} \
     ${@multilib_pkg_extend(d, "libgcc-dev")} \
