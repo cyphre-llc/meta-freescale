@@ -21,6 +21,11 @@ EXTRA_OECONF_e5500 = "--target-list=ppc64-softmmu ${PPC_OECONF}"
 EXTRA_OECONF_e500v2 = "--target-list=ppc-softmmu ${PPC_OECONF}"
 EXTRA_OECONF_e500mc = "--target-list=ppc-softmmu ${PPC_OECONF}"
 
+PACKAGECONFIG[quorum] = ""
+PACKAGECONFIG[lzo]    = ""
+PACKAGECONFIG[numa]   = ""
+PACKAGECONFIG[gtk+] = ""
+
 do_configure_prepend() {
     export PKG_CONFIG=${STAGING_DIR_NATIVE}${bindir_native}/pkg-config
 }
