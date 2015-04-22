@@ -4,7 +4,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=95560debfde180684364319811cc1421"
 
 DEPENDS = "elfutils"
 
-SRC_URI = "git://git.freescale.com/ppc/sdk/apptrk.git;nobranch=1"
+SRC_URI = "git://git.freescale.com/ppc/sdk/apptrk.git;nobranch=1 \
+    file://no-strip.patch \
+"
 SRCREV = "cbed10997c5e2a4aaa004fb0e1efec858bf1bbe1"
 
 EXTRA_OEMAKE_qoriq-arm = 'ARCH=arm'
@@ -24,4 +26,4 @@ do_install() {
     oe_runmake install DESTDIR=${D}
 }
 
-COMPATIBLE_MACHINE_qoriq = ".*"
+COMPATIBLE_MACHINE = "qoriq"
