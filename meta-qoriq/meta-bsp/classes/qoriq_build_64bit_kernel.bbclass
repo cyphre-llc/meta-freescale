@@ -11,4 +11,3 @@ python () {
     if 'arch' in error_qa:
         d.setVar('ERROR_QA', error_qa.replace(' arch', ''))
 }
-

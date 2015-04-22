@@ -12,4 +12,3 @@ rootfs_copy_minimal_image() {
     mkdir ${IMAGE_ROOTFS}/images
     cp ${DEPLOY_DIR_IMAGE}/fsl-image-minimal-${MACHINE}.ext2.gz ${IMAGE_ROOTFS}/images
 }
-
