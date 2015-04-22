@@ -185,6 +185,7 @@ LAYER_LIST=" \
     meta-openembedded/meta-networking \
     meta-openembedded/meta-python \
     meta-openembedded/meta-filesystems \
+    meta-openembedded/meta-webserver \
     \
     meta-freescale/common \
     \
