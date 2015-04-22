@@ -66,8 +66,4 @@ IMAGE_INSTALL += " \
     ${SOC_SPECIFIC} \
 "
 
-IMAGE_INSTALL_remove_ls102xa = " \
-     u-boot-qoriq-images \
-"
-
 IMAGE_FSTYPES = "tar.gz"
