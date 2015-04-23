@@ -16,7 +16,7 @@ LIC_FILES_CHKSUM = " \
 
 PV = "2014.07+fslgit"
 INHIBIT_DEFAULT_DEPS = "1"
-DEPENDS = "boot-format-native libgcc ${@base_contains('TCMODE', 'external-fsl', '', 'virtual/${TARGET_PREFIX}gcc', d)}"
+DEPENDS_qoriq-ppc = "boot-format-native libgcc ${@base_contains('TCMODE', 'external-fsl', '', 'virtual/${TARGET_PREFIX}gcc', d)}"
 
 inherit deploy
 
@@ -77,10 +77,6 @@ do_compile_append_qoriq-ppc () {
             echo "WARNING: $board not supported in boards.cfg"
             continue
         fi
-
-        #oe_runmake O=${board} distclean
-        #oe_runmake O=${board} ${board}_config
-        #oe_runmake O=${board} all
 
         case "${board}" in
             *SDCARD*)   UBOOT_TARGET="u-boot-sd";;
