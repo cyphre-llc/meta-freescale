@@ -61,7 +61,7 @@ RDEPENDS_packagegroup-fsl-extend-usbhost = "\
 RDEPENDS_packagegroup-fsl-extend-virtualization += "\
     qemu \
 "
-RRECOMMENDS_packagegroup-fsl-extend-virtualization += "\
+RSUGGESTS_packagegroup-fsl-extend-virtualization += "\
     lxc \
     libvirt \
     libvirt-libvirtd \
@@ -98,6 +98,7 @@ RDEPENDS_packagegroup-fsl-extend-misc = "\
     parted \
     perf \
     quilt \
+    resolvconf \
     rpm \
     rt-tests \
     subversion \
