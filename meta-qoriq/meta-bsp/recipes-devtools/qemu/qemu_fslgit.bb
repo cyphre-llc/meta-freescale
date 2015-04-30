@@ -6,6 +6,14 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=441c28d2cf86e15a37fa47e15a72fbac \
 # This means QEMU v1.7 with FSL specific patches applied
 PV = "1.7+fsl"
 
+# NOTE: these options are note available in qemu 1.7, but qemu.inc assumes
+# version 2.0+ where they are available. For now we unset them, but we should
+# remove the following lines when upgrading to qemu 2.0+:
+PACKAGECONFIG[quorum] = ""
+PACKAGECONFIG[lzo]    = ""
+PACKAGECONFIG[numa]   = ""
+PACKAGECONFIG[gtk+] = ""
+
 SRC_URI = "git://git.freescale.com/ppc/sdk/qemu.git;nobranch=1"
 SRCREV = "6ac4597c059d35e2737b234747243e56d340f4db"
 
@@ -20,11 +28,6 @@ EXTRA_OECONF_e6500 = "--target-list=ppc64-softmmu ${PPC_OECONF}"
 EXTRA_OECONF_e5500 = "--target-list=ppc64-softmmu ${PPC_OECONF}"
 EXTRA_OECONF_e500v2 = "--target-list=ppc-softmmu ${PPC_OECONF}"
 EXTRA_OECONF_e500mc = "--target-list=ppc-softmmu ${PPC_OECONF}"
-
-PACKAGECONFIG[quorum] = ""
-PACKAGECONFIG[lzo]    = ""
-PACKAGECONFIG[numa]   = ""
-PACKAGECONFIG[gtk+] = ""
 
 do_configure_prepend() {
     export PKG_CONFIG=${STAGING_DIR_NATIVE}${bindir_native}/pkg-config
