@@ -46,3 +46,4 @@ do_install () {
 }
 
 BBCLASSEXTEND = "native"
+COMPATIBLE_MACHINE = "(qoriq-ppc)"
