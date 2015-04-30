@@ -19,7 +19,7 @@ do_install () {
     oe_runmake install
 
     M=`echo ${MACHINE} | sed s/-64b//g`
-    if [ "t1042rdb-pi" = "${M}" ];then
+    if [ "t1042rdb" = "${M}" ] || [ "t1042rdb-pi" = "${M}" ];then
         M=t1042rdb_pi
     fi
     install -d ${D}/boot/rcw
@@ -28,7 +28,7 @@ do_install () {
 
 do_deploy () {
     M=`echo ${MACHINE} | sed s/-64b//g`
-    if [ "t1042rdb-pi" = "${M}" ];then
+    if [ "t1042rdb" = "${M}" ] || [ "t1042rdb-pi" = "${M}" ];then
         M=t1042rdb_pi
     fi
     install -d ${DEPLOYDIR}/rcw
