@@ -22,7 +22,6 @@ S = "${WORKDIR}/git"
 
 do_install () {
     make install
-    
     M=`echo ${MACHINE} | sed s/-64b//g`
     if [ "t1042rdb" = "${M}" ];then
         M=t1040rdb

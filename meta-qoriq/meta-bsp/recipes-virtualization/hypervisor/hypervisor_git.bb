@@ -48,7 +48,7 @@ do_compile () {
         oe_runmake deploy
         cd ..
     fi
-    
+
     oe_runmake
     oe_runmake partman
 }
@@ -56,10 +56,10 @@ do_compile () {
 do_install () {
     install -d ${D}/${bindir}
     install ${B}/${OUTPUT}/bin/linux/partman ${D}/${bindir}/partman
-    
+
     install -d ${D}${sysconfdir}/udev/rules.d
     install -m 0644 ${WORKDIR}/81-fsl-embedded-hv.rules ${D}${sysconfdir}/udev/rules.d
-    
+
     install -d ${D}/boot/hv
     install ${B}/${OUTPUT}/.config ${D}/boot/hv/hypervisor.config
     install -m 644 ${B}/${OUTPUT}/bin/hv ${B}/${OUTPUT}/bin/hv.map \
