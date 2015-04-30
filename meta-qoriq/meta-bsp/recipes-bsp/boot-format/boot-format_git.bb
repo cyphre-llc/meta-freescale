@@ -17,4 +17,3 @@ PACKAGES =+ "${PN}-config"
 FILES_${PN}-config += "${datadir}/*"
 
 BBCLASSEXTEND = "native nativesdk"
-COMPATIBLE_MACHINE = "(qoriq-ppc)"
