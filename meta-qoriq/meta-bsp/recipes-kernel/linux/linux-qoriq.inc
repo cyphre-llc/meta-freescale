@@ -1,4 +1,4 @@
-inherit kernel qoriq_build_64bit_kernel
+inherit kernel kernel-arch qoriq_build_64bit_kernel
 inherit fsl-kernel-localversion
 require recipes-kernel/linux/linux-dtb.inc
 
@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 KSRC ?= ""
 S = '${@base_conditional("KSRC", "", "${WORKDIR}/git", "${KSRC}", d)}'
 
-DEPENDS_append = " libgcc" 
+DEPENDS_append = " libgcc"
 KERNEL_CC_append = " ${TOOLCHAIN_OPTIONS}"
 KERNEL_LD_append = " ${TOOLCHAIN_OPTIONS}"
 
@@ -21,12 +21,12 @@ DELTA_KERNEL_DEFCONFIG ?= ""
 do_configure_prepend() {
     # copy desired defconfig so we pick it up for the real kernel_do_configure
     cp ${KERNEL_DEFCONFIG} ${B}/.config
-    cp ${KERNEL_DEFCONFIG} ${WORKDIR}/defconfig   
+    cp ${KERNEL_DEFCONFIG} ${WORKDIR}/defconfig
     # add config fragments
     for deltacfg in ${DELTA_KERNEL_DEFCONFIG}; do
         if [ -f "${deltacfg}" ]; then
             ${S}/scripts/kconfig/merge_config.sh -m .config ${deltacfg}
-        elif [ -f "${S}/arch/powerpc/configs/${deltacfg}" ]; then
+        elif [ -f "${S}/arch/${ARCH}/configs/${deltacfg}" ]; then
             ${S}/scripts/kconfig/merge_config.sh -m .config \
                 ${S}/arch/powerpc/configs/${deltacfg}
         fi
