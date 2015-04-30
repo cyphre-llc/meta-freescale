@@ -5,8 +5,8 @@ LIC_FILES_CHKSUM = "file://Makefile;endline=30;md5=6a26ed8e76a8ea2e019c525369ed0
 inherit module qoriq_build_64bit_kernel
 RDEPENDS_${PN} += "cryptodev-module"
 
-# NOTE: remove this requirement and all traces of DISTRO_FEATURE c29x_pkc
-# if pkc-host does not need customized cryptodev patches anymore
+# Currently pkc-host does not support RSA_KEYGEN, remove this
+# if it is fixed.
 REQUIRED_DISTRO_FEATURES = "c29x_pkc"
 
 SRC_URI = "git://git.freescale.com/ppc/sdk/pkc-host.git;nobranch=1"
