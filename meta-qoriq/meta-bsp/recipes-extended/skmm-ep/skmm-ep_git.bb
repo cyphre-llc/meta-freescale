@@ -4,6 +4,8 @@ LIC_FILES_CHKSUM = "file://Makefile;endline=30;md5=39e58bedc879163c9338596e52df5
 
 DEPENDS = "libedit openssl virtual/kernel"
 
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
 SRC_URI = "git://git.freescale.com/ppc/sdk/skmm-ep.git;nobranch=1 \
     file://add-two-missing-header-files.patch \
 "
@@ -13,8 +15,8 @@ S = "${WORKDIR}/git"
 
 EXTRA_OEMAKE = 'MACHINE=${MACHINE}'
 
-export LIBEDIT_CFLAGS= "`pkg-config --cflags libedit`"
-export LIBEDIT_LDFLAGS= "`pkg-config --libs --static libedit`"
+export LIBEDIT_CFLAGS = "`pkg-config --cflags libedit`"
+export LIBEDIT_LDFLAGS = "`pkg-config --libs --static libedit`"
 
 do_compile () {
     export ARCH=${TARGET_ARCH}
