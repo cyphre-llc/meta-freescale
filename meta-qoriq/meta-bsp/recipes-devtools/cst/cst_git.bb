@@ -23,5 +23,3 @@ BBCLASSEXTEND = "native nativesdk"
 PARALLEL_MAKE = ""
 
 FILES_${PN}-dbg += "${bindir}/cst/.debug"
-
-COMPATIBLE_MACHINE = "(qoriq)"
