@@ -6,8 +6,6 @@ SRC_URI = "git://git.freescale.com/ppc/sdk/asf.git;nobranch=1 \
 "
 SRCREV = "16eb472d6b2b34c8b605a86c469611bc8ddec1c9"
 
-DEPENDS="virtual/kernel"
-do_configure[depends] += "virtual/kernel:do_shared_workdir"
 RDEPENDS_${PN} += "ipsec-tools"
 
 inherit module qoriq_build_64bit_kernel
@@ -15,10 +13,11 @@ inherit module qoriq_build_64bit_kernel
 S = "${WORKDIR}/git/asfmodule"
 
 EXTRA_OEMAKE = "CROSS_COMPILE=${TARGET_PREFIX}"
-export KERNEL_PATH = "${STAGING_KERNEL_DIR}/"
+export KERNEL_PATH = "${STAGING_KERNEL_DIR}"
 
-do_configure_append (){
-    cp ${STAGING_KERNEL_BUILDDIR}/.config  ${STAGING_KERNEL_DIR}/
+do_configure[depends] += "virtual/kernel:do_shared_workdir"
+do_configure_prepend() {
+    sed -i 's,$(KERNEL_PATH)/.config,$(KBUILD_OUTPUT)/.config,' ${S}/Makefile
 }
 
 do_install(){
