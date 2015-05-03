@@ -8,6 +8,8 @@ inherit allarch
 
 SRC_URI = "file://test_setkey"
 
+S = "${WORKDIR}"
+
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"
 
