@@ -6,6 +6,9 @@ SRC_URI = "\
     file://71-fsl-dpaa-persistent-networking.rules \
     file://72-fsl-dpaa-persistent-networking.rules \
 "
+
+S = "${WORKDIR}"
+
 RULE ?= "71-fsl-dpaa-persistent-networking.rules"
 RULE_e6500 = "72-fsl-dpaa-persistent-networking.rules"
 RULE_e6500-64b = "72-fsl-dpaa-persistent-networking.rules"
