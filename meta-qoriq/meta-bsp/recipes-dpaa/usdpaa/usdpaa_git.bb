@@ -11,6 +11,8 @@ DEPENDS_append_b4860qds = " ipc-ust"
 DEPENDS_append_b4420qds = " ipc-ust"
 
 RDEPENDS_${PN} = "libgcc bash"
+RDEPENDS_${PN}_append_b4860qds = " ipc-ust"
+RDEPENDS_${PN}_append_b4420qds = " ipc-ust"
 
 SRC_URI = "git://git.freescale.com/ppc/sdk/usdpaa.git;nobranch=1"
 SRCREV = "d9975948bb6bf9fdcec189c0f1c31ce45f74961c"
