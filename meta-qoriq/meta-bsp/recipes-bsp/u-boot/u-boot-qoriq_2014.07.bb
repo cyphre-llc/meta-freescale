@@ -16,7 +16,8 @@ LIC_FILES_CHKSUM = " \
 
 PV = "2014.07+fslgit"
 INHIBIT_DEFAULT_DEPS = "1"
-DEPENDS_qoriq-ppc = "boot-format-native libgcc virtual/${TARGET_PREFIX}gcc"
+DEPENDS = "libgcc virtual/${TARGET_PREFIX}gcc"
+DEPENDS_append_qoriq-ppc = "boot-format-native"
 DEPENDS_append_qoriq_arm = "change-file-endianess-native"
 
 inherit deploy
