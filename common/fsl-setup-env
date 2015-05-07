@@ -20,12 +20,6 @@
 # Add options for the script
 # Copyright (C) 2013-2015 Freescale Semiconductor, Inc.
 
-# Check if current user is root
-if [ "$(whoami)" = "root" ]; then
-    echo "ERROR: Do not use the BSP as root. Exiting..."
-    return
-fi
-
 ROOTDIR="`readlink -f $BASH_SOURCE | xargs dirname`"
 PROGNAME="fsl-setup-env"
 
@@ -38,12 +32,18 @@ if [ -z "$ZSH_NAME" ] && echo "$0" | grep -q "$PROGNAME"; then
         echo "Try run command \". $SCRIPT_PATH -h\" to get help."
     fi
     unset SCRIPT_PATH ROOTDIR PROGNAME
-    return
+    exit
 else
     OEROOTDIR=${ROOTDIR}/sources/poky
     if [ -e ${ROOTDIR}/sources/oe-core ]; then
         OEROOTDIR=${ROOTDIR}/sources/oe-core
     fi
+fi
+
+# Check if current user is root
+if [ "$(whoami)" = "root" ]; then
+    echo "ERROR: Do not use the BSP as root. Exiting..."
+    return
 fi
 
 prompt_message ()
