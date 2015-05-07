@@ -20,7 +20,6 @@
 # Add options for the script
 # Copyright (C) 2013-2015 Freescale Semiconductor, Inc.
 
-ROOTDIR="`readlink -f $BASH_SOURCE | xargs dirname`"
 PROGNAME="fsl-setup-env"
 
 if [ -z "$ZSH_NAME" ] && echo "$0" | grep -q "$PROGNAME"; then
@@ -31,19 +30,33 @@ if [ -z "$ZSH_NAME" ] && echo "$0" | grep -q "$PROGNAME"; then
     else
         echo "Try run command \". $SCRIPT_PATH -h\" to get help."
     fi
-    unset SCRIPT_PATH ROOTDIR PROGNAME
+    unset SCRIPT_PATH PROGNAME
     exit
 else
-    OEROOTDIR=${ROOTDIR}/sources/poky
-    if [ -e ${ROOTDIR}/sources/oe-core ]; then
-        OEROOTDIR=${ROOTDIR}/sources/oe-core
+    if [ -n "$BASH_SOURCE" ]; then
+        ROOTDIR="`readlink -f $BASH_SOURCE | xargs dirname`"
+    elif [ -n "$ZSH_NAME" ]; then
+        ROOTDIR="`readlink -f $0 | xargs dirname`"
+    else
+        ROOTDIR="`readlink -f $PWD | xargs dirname`"
+    fi
+    if ! [ -e "$ROOTDIR/$PROGNAME" ];then
+        echo "Go to where $PROGNAME locates, then run: . $PROGNAME <args>"
+        unset ROOTDIR PROGNAME
+        return
     fi
 fi
 
 # Check if current user is root
 if [ "$(whoami)" = "root" ]; then
     echo "ERROR: Do not use the BSP as root. Exiting..."
+    unset ROOTDIR PROGNAME
     return
+fi
+
+OEROOTDIR=${ROOTDIR}/sources/poky
+if [ -e ${ROOTDIR}/sources/oe-core ]; then
+    OEROOTDIR=${ROOTDIR}/sources/oe-core
 fi
 
 prompt_message ()
@@ -85,7 +98,7 @@ clean_up()
 
 usage()
 {
-    echo "Usage: source $PROGNAME -m <machine>"
+    echo "Usage: . $PROGNAME -m <machine>"
 
     ls sources/meta-freescale/*/meta-bsp/conf/machine/*.conf > /dev/null 2>&1
 
