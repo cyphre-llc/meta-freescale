@@ -1,3 +1,10 @@
+FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
+
+SRC_URI_append_qoriq-ppc = " \
+    file://override-32-bit-glibc-memcpy-memset.patch \
+"
+EXTRA_OECONF_append_qoriq-ppc = " --program-prefix=${TARGET_ARCH}-"
+
 do_install_append_qoriq-ppc() {
     # Create a symbolic link as the user expects to see a /usr/bin/valgrind
     # On 64-bit MACHINE's, ensure that the link created, points to the *64-bit*
