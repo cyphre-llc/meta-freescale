@@ -199,6 +199,7 @@ LAYER_LIST=" \
     meta-freescale/meta-imx/meta-qt \
     \
     meta-freescale/meta-qoriq/meta-bsp \
+    meta-freescale/meta-qoriq/meta-sdk \
     meta-freescale/meta-qoriq/meta-toolchain \
     \
     meta-qt5 \
