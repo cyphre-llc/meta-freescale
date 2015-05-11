@@ -2,9 +2,11 @@ DESCRIPTION = "Openstack demo scripts and configure files"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=4d92cd373abda3937c2bc47fbc49d690"
 
-SRC_URI = " file://Havana_conf.tgz \
+SRC_URI = " file://Havana_conf \
     file://openstack_deploy_T4.sh \
 "
+
+S = "${WORKDIR}"
 
 do_install () {
     install -d ${D}${ROOT_HOME}
