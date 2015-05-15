@@ -48,6 +48,7 @@ CVEPATCHES = "\
         file://CVE-2014-7817-wordexp-fails-to-honour-WRDE_NOCMD.patch \
         file://CVE-2012-3406-Stack-overflow-in-vfprintf-BZ-16617.patch \
         file://CVE-2014-9402_endless-loop-in-getaddr_r.patch \
+        file://CVE-2015-1781-resolv-nss_dns-dns-host.c-buffer-overf.patch \
     "
 
 FSLPATCHES = "\
