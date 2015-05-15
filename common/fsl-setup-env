@@ -195,8 +195,7 @@ LAYER_LIST=" \
     meta-freescale/common \
     \
     meta-freescale/meta-imx/meta-bsp \
-    meta-freescale/meta-imx/meta-oe \
-    meta-freescale/meta-imx/meta-qt \
+    meta-freescale/meta-imx/meta-sdk \
     \
     meta-freescale/meta-qoriq/meta-bsp \
     meta-freescale/meta-qoriq/meta-sdk \
