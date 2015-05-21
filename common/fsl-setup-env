@@ -274,7 +274,7 @@ set -- $PROJECT_DIR
 # if conf/local.conf not generated, no need to go further
 if [ ! -e conf/local.conf ]; then
     echo "ERROR: the local.conf is not created, Exit ..."
-    clean_up && return
+    clean_up && cd $ROOTDIR && return
 fi
 
 # Remove comment lines and empty lines
