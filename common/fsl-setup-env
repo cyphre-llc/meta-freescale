@@ -99,7 +99,7 @@ Common targets are:
 clean_up()
 {
    unset PROGNAME ROOTDIR OEROOTDIR FSLROOTDIR PROJECT_DIR \
-         EULA EULA_FILE LAYER_LIST MACHINE DISTRO \
+         EULA EULA_FILE LAYER_LIST MACHINE FSLDISTRO \
          OLD_OPTIND CPUS JOBS THREADS DOWNLOADS CACHES \
          setup_flag setup_h setup_j setup_t setup_l setup_builddir \
          setup_download setup_sstate setup_error layer append_layer
@@ -134,7 +134,7 @@ usage() {
 "
     if [ "`readlink $SHELL`" = "dash" ];then
         echo "
-    You are using dash which not pass args when being sourced.
+    You are using dash which does not pass args when being sourced.
     To workaround this limitation, use \"set -- args\" prior to
     sourcing this script. For exmaple:
         \$ set -- -m p4080ds -j 3 -t 2
@@ -210,11 +210,15 @@ LAYER_LIST=" \
 "
 
 if [ -e "$FSLROOTDIR/meta-imx/meta-bsp/conf/machine/${MACHINE}.conf" ]; then
-    DISTRO="poky"
+    FSLDISTRO="fsl-imx-x11"
     EULA_FILE="$FSLROOTDIR/meta-imx/license/EULA"
 elif [ -e "$FSLROOTDIR/meta-qoriq/meta-bsp/conf/machine/${MACHINE}.conf" ]; then
-    DISTRO='fsl-qoriq'
+    FSLDISTRO='fsl-qoriq'
     EULA_FILE="$FSLROOTDIR/meta-qoriq/meta-bsp/custom-licenses/Freescale-EULA"
+fi
+
+if [ -z "$DISTRO" ]; then
+    DISTRO="$FSLDISTRO"
 fi
 
 # set default jobs and threads
@@ -280,6 +284,12 @@ fi
 # Remove comment lines and empty lines
 sed -i -e '/^#.*/d' -e '/^$/d' conf/local.conf
 
+# Change settings according to the environment
+sed -e "s,MACHINE ??=.*,MACHINE ??= '$MACHINE',g" \
+        -e "s,SDKMACHINE ??=.*,SDKMACHINE ??= '$SDKMACHINE',g" \
+        -e "s,DISTRO ?=.*,DISTRO ?= '$DISTRO',g" \
+        -i conf/local.conf
+
 # Clean up PATH, because if it includes tokens to current directories somehow,
 # wrong binaries can be used instead of the expected ones during task execution
 export PATH="`echo $PATH | sed 's/\(:.\|:\)*:/:/g;s/^.\?://;s/:.\?$//'`"
@@ -300,9 +310,6 @@ done
 
 cat >> conf/local.conf <<-EOF
 
-# Machine and distro setting
-MACHINE ?= "$MACHINE"
-DISTRO = "$DISTRO"
 # Parallelism Options
 BB_NUMBER_THREADS = "$THREADS"
 PARALLEL_MAKE = "-j $JOBS"
