@@ -244,16 +244,24 @@ else
 fi
 mkdir -p $PROJECT_DIR
 
-if test $setup_download; then
-    DOWNLOADS="$setup_download"
+if [ -n "$setup_download" ]; then
+    if echo $setup_download |grep -q ^/;then
+        DOWNLOADS="${setup_download}"
+    else
+        DOWNLOADS="`pwd`/${setup_download}"
+    fi
 else
     DOWNLOADS="$ROOTDIR/downloads"
 fi
 mkdir -p $DOWNLOADS
 DOWNLOADS=`readlink -f "$DOWNLOADS"`
 
-if test $setup_sstate; then
-    CACHES="$setup_sstate"
+if [ -n "$setup_sstate" ]; then
+    if echo $setup_sstate |grep -q ^/;then
+        CACHES="${setup_sstate}"
+    else
+        CACHES="`pwd`/${setup_sstate}"
+    fi
 else
     CACHES="$ROOTDIR/sstate-cache"
 fi
