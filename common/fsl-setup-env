@@ -125,17 +125,17 @@ usage() {
 
     echo "    Optional parameters:
     * [-m machine]: the target machine to be built.
-    * [-b path]:    non-default path of project build folder. 
+    * [-b path]:    non-default path of project build folder.
     * [-j jobs]:    number of jobs for make to spawn during the compilation stage.
     * [-t tasks]:   number of BitBake tasks that can be issued in parallel.
     * [-d path]:    non-default path of DL_DIR (downloaded source)
     * [-c path]:    non-default path of SSTATE_DIR (shared state Cache)
-    * [-l]:         lite mode. To help conserve disk space, deletes the building 
+    * [-l]:         lite mode. To help conserve disk space, deletes the building
                     directory once the package is built.
     * [-h]:         help
 "
     if [ "`readlink $SHELL`" = "dash" ];then
-        echo "                                                                                                                          
+        echo "
     You are using dash which not pass args when being sourced.
     To workaround this limitation, use \"set -- args\" prior to
     sourcing this script. For exmaple:
@@ -163,14 +163,15 @@ do
         c) setup_sstate="$OPTARG";
            ;;
         l) setup_l='true';
-           ;;  
+           ;;
         h) setup_h='true';
            ;;
         ?) setup_error='true';
            ;;
     esac
 done
-OPTIND=$OLD_OPTIND                                                                                                                      
+OPTIND=$OLD_OPTIND
+
 # check the "-h" and other not supported options
 if test $setup_error || test $setup_h; then
     usage && clean_up && return
@@ -226,7 +227,7 @@ THREADS="4"
 # check optional jobs and threads
 if echo "$setup_j" | egrep -q "^[0-9]+$"; then
     JOBS=$setup_j
-fi                                                                                                                                      
+fi
 if echo "$setup_t" | egrep -q "^[0-9]+$"; then
     THREADS=$setup_t
 fi
@@ -374,4 +375,4 @@ fi
 
 prompt_message
 cd $PROJECT_DIR
-clean_up 
+clean_up
