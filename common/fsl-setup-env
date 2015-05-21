@@ -232,9 +232,16 @@ if echo "$setup_t" | egrep -q "^[0-9]+$"; then
 fi
 
 # set project folder location and name
-if test $setup_builddir; then
-    PROJECT_DIR=`pwd`/${setup_builddir}
+if [ -n "$setup_builddir" ]; then
+    if echo $setup_builddir |grep -q ^/;then
+        PROJECT_DIR="${setup_builddir}"
+    else
+        PROJECT_DIR="`pwd`/${setup_builddir}"
+    fi
+else
+    PROJECT_DIR=${ROOTDIR}/build_${MACHINE}
 fi
+mkdir -p $PROJECT_DIR
 
 if test $setup_download; then
     DOWNLOADS="$setup_download"
