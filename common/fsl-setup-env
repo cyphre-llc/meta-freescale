@@ -58,9 +58,11 @@ OEROOTDIR=${ROOTDIR}/sources/poky
 if [ -e ${ROOTDIR}/sources/oe-core ]; then
     OEROOTDIR=${ROOTDIR}/sources/oe-core
 fi
+FSLROOTDIR=${ROOTDIR}/sources/meta-freescale
+PROJECT_DIR=${ROOTDIR}/build_${MACHINE}
 
-prompt_message ()
-{
+prompt_message () {
+local i=''
 echo "Welcome to Freescale Community BSP
 
 The Yocto Project has extensive documentation about OE including a
@@ -79,6 +81,16 @@ Common targets are:
     adt-installer
     meta-ide-support
 "
+    echo "Targets for i.MX:"
+    for i in `ls $FSLROOTDIR/{common,meta-imx}/meta-*/recipes-*/images/*.bb 2>/dev/null`;do
+        i=`basename $i`;i=`echo $i |sed -e 's,^\(.*\)\.bb,\1,'`
+        echo "    $i";
+    done
+    echo "Targets for QorIQ:"
+    for i in `ls $FSLROOTDIR/{common,meta-qoriq}/meta-*/recipes-*/images/*.bb 2>/dev/null`;do
+        i=`basename $i`;i=`echo $i |sed -e 's,^\(.*\)\.bb,\1,'`
+        echo "    $i";
+    done
 
     echo "To return to this build environment later please run:"
     echo "    . $PROJECT_DIR/SOURCE_THIS"
@@ -86,9 +98,10 @@ Common targets are:
 
 clean_up()
 {
-   unset LIST_IMX_MACHINES LIST_QORIQ_MACHINES VALID_IMX_MACHINE \
-         VALID_QORIQ_MACHINE ROOTDIR PROJECT_DIR DOWNLOADS CACHES \
-         EULA EULA_FILE PROGNAME LAYER_LIST MACHINE DISTRO OEROOTDIR \
+   unset PROGNAME ROOTDIR OEROOTDIR FSLROOTDIR PROJECT_DIR \
+         LIST_IMX_MACHINES LIST_QORIQ_MACHINES VALID_IMX_MACHINE \
+         VALID_QORIQ_MACHINE DOWNLOADS CACHES \
+         EULA EULA_FILE LAYER_LIST MACHINE DISTRO \
          OLD_OPTIND OPTIND CPUS JOBS THREADS \
          setup_h setup_j setup_t setup_l setup_builddir \
          setup_mirror setup_download setup_sstate \
@@ -231,8 +244,6 @@ fi
 # set project folder location and name
 if test $setup_builddir; then
     PROJECT_DIR=`pwd`/${setup_builddir}
-else
-    PROJECT_DIR=`pwd`/build_${MACHINE}
 fi
 
 if test $setup_download; then
