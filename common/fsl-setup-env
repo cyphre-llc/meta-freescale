@@ -99,8 +99,7 @@ Common targets are:
 clean_up()
 {
    unset PROGNAME ROOTDIR OEROOTDIR FSLROOTDIR PROJECT_DIR \
-         LIST_IMX_MACHINES LIST_QORIQ_MACHINES VALID_IMX_MACHINE \
-         VALID_QORIQ_MACHINE DOWNLOADS CACHES \
+         DOWNLOADS CACHES \
          EULA EULA_FILE LAYER_LIST MACHINE DISTRO \
          OLD_OPTIND OPTIND CPUS JOBS THREADS \
          setup_h setup_j setup_t setup_l setup_builddir \
@@ -109,18 +108,16 @@ clean_up()
    unset -f usage prompt_message
 }
 
-usage()
-{
+usage() {
     echo "Usage: . $PROGNAME -m <machine>"
-    cd $ROOTDIR
-    ls sources/meta-freescale/*/meta-bsp/conf/machine/*.conf > /dev/null 2>&1
+    ls $FSLROOTDIR/*/meta-bsp/conf/machine/*.conf > /dev/null 2>&1
 
     if [ $? -eq 0 ]; then
         echo -e "\n    Supported machines
-    i.MX:  `ls sources/meta-freescale/meta-imx/meta-bsp/conf/machine \
-| grep "\.conf" | sed s/\.conf//g | xargs echo`
-    QorIQ: `ls sources/meta-freescale/meta-qoriq/meta-bsp/conf/machine \
-| grep "\.conf" | sed s/\.conf//g | xargs echo`
+    i.MX:  `ls $FSLROOTDIR/meta-imx/meta-bsp/conf/machine \
+           | grep "\.conf" | sed s/\.conf//g | xargs echo`
+    QorIQ: `ls $FSLROOTDIR/meta-qoriq/meta-bsp/conf/machine \
+           | grep "\.conf" | sed s/\.conf//g | xargs echo`
 "
     else
         echo "    ERROR: no available machine conf file is found. "
@@ -179,21 +176,14 @@ if test $setup_error || test $setup_h; then
     usage && clean_up && return
 fi
 
-if [ -z "$MACHINE" ]; then
-    echo "ERROR: Please specify an invalid machine!"
-    usage && clean_up && return
-fi
-
 # Check the machine type specified
-LIST_IMX_MACHINES=`ls -1 $ROOTDIR/sources/meta-freescale/meta-imx/meta-bsp/conf/machine`
-LIST_QORIQ_MACHINES=`ls -1 $ROOTDIR/sources/meta-freescale/meta-qoriq/meta-bsp/conf/machine`
-VALID_IMX_MACHINE=`echo -e "$LIST_IMX_MACHINES" | grep ${MACHINE}.conf$ | wc -l`
-VALID_QORIQ_MACHINE=`echo -e "$LIST_QORIQ_MACHINES" | grep ${MACHINE}.conf$ | wc -l`
-if [ "x$MACHINE" = "x" ] || [ "$VALID_IMX_MACHINE" = "0" ] && [ "$VALID_QORIQ_MACHINE" = "0" ]; then
+if [ -n "${MACHINE}" ] && \
+    [ -e "$FSLROOTDIR/meta-qoriq/meta-bsp/conf/machine/${MACHINE}.conf" ] || \
+    [ -e "$FSLROOTDIR/meta-imx/meta-bsp/conf/machine/${MACHINE}.conf" ]; then
+    echo "Configuring for ${MACHINE} ..."
+else
     echo -e "\nThe \$MACHINE you have specified ($MACHINE) is not supported by this build setup."
     usage && clean_up && return
-else
-    echo "Configuring for ${MACHINE} ..."
 fi
 
 LAYER_LIST=" \
@@ -220,12 +210,12 @@ LAYER_LIST=" \
     meta-virtualization \
 "
 
-if [ "$VALID_IMX_MACHINE" != "0" ]; then
+if [ -e "$FSLROOTDIR/meta-imx/meta-bsp/conf/machine/${MACHINE}.conf" ]; then
     DISTRO="poky"
-    EULA_FILE="$ROOTDIR/sources/meta-freescale/meta-imx/license/EULA"
-elif [ "$VALID_QORIQ_MACHINE" != "0" ]; then
+    EULA_FILE="$FSLROOTDIR/meta-imx/license/EULA"
+elif [ -e "$FSLROOTDIR/meta-qoriq/meta-bsp/conf/machine/${MACHINE}.conf" ]; then
     DISTRO='fsl-qoriq'
-    EULA_FILE="$ROOTDIR/sources/meta-freescale/meta-qoriq/meta-bsp/custom-licenses/Freescale-EULA"
+    EULA_FILE="$FSLROOTDIR/meta-qoriq/meta-bsp/custom-licenses/Freescale-EULA"
 fi
 
 # set default jobs and threads
