@@ -99,12 +99,10 @@ Common targets are:
 clean_up()
 {
    unset PROGNAME ROOTDIR OEROOTDIR FSLROOTDIR PROJECT_DIR \
-         DOWNLOADS CACHES \
          EULA EULA_FILE LAYER_LIST MACHINE DISTRO \
-         OLD_OPTIND OPTIND CPUS JOBS THREADS \
-         setup_h setup_j setup_t setup_l setup_builddir \
-         setup_mirror setup_download setup_sstate \
-         setup_error append_layer
+         OLD_OPTIND CPUS JOBS THREADS DOWNLOADS CACHES \
+         setup_flag setup_h setup_j setup_t setup_l setup_builddir \
+         setup_download setup_sstate setup_error layer append_layer
    unset -f usage prompt_message
 }
 
@@ -374,7 +372,6 @@ fi
 # make a SOURCE_THIS file
 if [ ! -e SOURCE_THIS ]; then
     echo "#!/bin/sh" >> SOURCE_THIS
-    echo $OEROOTDIR
     echo "cd $OEROOTDIR" >> SOURCE_THIS
     echo "set -- $PROJECT_DIR" >> SOURCE_THIS
     echo ". ./oe-init-build-env > /dev/null" >> SOURCE_THIS
