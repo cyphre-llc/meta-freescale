@@ -210,7 +210,7 @@ LAYER_LIST=" \
 "
 
 if [ -e "$FSLROOTDIR/meta-imx/meta-bsp/conf/machine/${MACHINE}.conf" ]; then
-    FSLDISTRO="fsl-imx-x11"
+    FSLDISTRO="fslc-imx"
     EULA_FILE="$FSLROOTDIR/meta-imx/license/EULA"
 elif [ -e "$FSLROOTDIR/meta-qoriq/meta-bsp/conf/machine/${MACHINE}.conf" ]; then
     FSLDISTRO='fsl-qoriq'
