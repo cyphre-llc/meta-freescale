@@ -9,10 +9,34 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=3f40d7994397109285ec7b81fdeb3
 
 inherit packagegroup
 
-RDEPENDS_${PN} = " \
-    pkgconfig \
-    debianutils \
-    bison \
-    ccache \
+PACKAGES = "${PN}"
+
+RDEPENDS_${PN} = "\
+    bc \
     chkconfig \
+    cronie \
+    db \
+    debianutils \
+    lsb \
+    lsbinitscripts \
+    lsbtest \
+    lsof \
+    man \
+    man-pages \
+    mdadm \
+    oprofile \
+    parted \
+    perf \
+    rt-tests \
+    sqlite3 \
+    strongswan \
+    texinfo \
+    unzip \
+    usbutils \
+    usbutils-ids \
+    util-linux \
+    watchdog \
+    which \
+    xz  \
+    zip \
 "

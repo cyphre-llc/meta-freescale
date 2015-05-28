@@ -9,20 +9,21 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=3f40d7994397109285ec7b81fdeb3
 
 inherit packagegroup
 
-FSL_X11_UTILS = "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'v4l-utils', '', d)}"
+PACKAGES = "${PN}"
 
 RDEPENDS_${PN} = " \
+    packagegroup-core-boot \
     bash \
-    busybox \
-    e2fsprogs-mke2fs \
+    util-linux \
+    dosfstools \
     mtd-utils \
     mtd-utils-ubifs \
     mtd-utils-jffs2 \
-    fsl-rc-local \
+    e2fsprogs \
+    e2fsprogs-badblocks \
+    e2fsprogs-e2fsck \
+    e2fsprogs-mke2fs \
+    e2fsprogs-tune2fs  \
     mdadm \
     hdparm \
-    packagegroup-fsl-tools-core-ext2 \
-    packagegroup-fsl-tools-graphics \
-    fbset \
-    ${FSL_X11_UTILS} \
 "
