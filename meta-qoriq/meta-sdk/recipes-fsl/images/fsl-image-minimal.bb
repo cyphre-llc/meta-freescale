@@ -7,8 +7,6 @@ IMAGE_INSTALL = " \
 "
 IMAGE_LINGUAS = ""
 
-include fsl-image-deploy.inc
-
 IMAGE_ROOTFS_SIZE = "8192"
 
 IMAGE_FSTYPES = "tar.gz ext2.gz.u-boot jffs2 ubi"
