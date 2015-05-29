@@ -10,7 +10,7 @@ inherit packagegroup
 
 PACKAGES = "${PN}"
 
-FSL_WEBSERVER = "nginx"
+FSL_WEBSERVER ?= ""
 RDEPENDS_${PN} = " \
     bind \
     curl \
@@ -22,7 +22,6 @@ RDEPENDS_${PN} = " \
     ppp-dialin \
     ptpd \
     resolvconf \
-    rng-tools \
     rp-pppoe \
     samba \
     wget \

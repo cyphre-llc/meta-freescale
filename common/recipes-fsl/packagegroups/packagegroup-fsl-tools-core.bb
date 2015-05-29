@@ -11,8 +11,10 @@ inherit packagegroup
 PACKAGES = "${PN}"
 
 RDEPENDS_${PN} = " \
-    bash \
-    hdparm \
+    e2fsprogs \
+    e2fsprogs-badblocks \
+    e2fsprogs-e2fsck \
+    e2fsprogs-tune2fs  \
     i2c-tools \
     kmod \
     libhugetlbfs \

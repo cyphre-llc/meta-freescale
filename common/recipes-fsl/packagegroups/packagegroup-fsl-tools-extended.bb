@@ -22,10 +22,10 @@ RDEPENDS_${PN} = "\
     lsof \
     man \
     man-pages \
-    mdadm \
     oprofile \
     parted \
     perf \
+    rng-tools \
     rt-tests \
     sqlite3 \
     strongswan \
@@ -33,7 +33,6 @@ RDEPENDS_${PN} = "\
     unzip \
     usbutils \
     usbutils-ids \
-    util-linux \
     watchdog \
     which \
     xz  \
