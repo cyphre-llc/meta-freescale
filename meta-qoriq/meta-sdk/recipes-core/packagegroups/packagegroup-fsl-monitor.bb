@@ -1,23 +1,26 @@
-SUMMARY = "fsl monitor pkgs"
+# Copyright (C) 2015 Freescale Semiconductor
+# Released under the MIT license (see COPYING.MIT for the terms)
+
+SUMMARY = "Freescale Package group for web system monitor"
 LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=3f40d7994397109285ec7b81fdeb3b58 \
+                    file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 
 inherit packagegroup
 
-RDEPENDS_packagegroup-fsl-monitor = "\
-    coreutils \
-    cronie \
-    bc \
-    lighttpd \
-    lighttpd-module-cgi \
+PACKAGES = "${PN}"
+
+FSL_WEBSERVER = "lighttpd lighttpd-module-cgi"
+
+RDEPENDS_${PN} = "\
+    packagegroup-core-x11-base \
     lmsensors-sensors \
     cairo \
     cairo-dev \
     rrdtool \
-    liberation-fonts \
-    make \
     web-sysmon \
 "
 
-RDEPENDS_packagegroup-fsl-monitor_remove_ls102xa = "\
+RDEPENDS_${PN}_remove_ls102xa = "\
     web-sysmon \
 "
