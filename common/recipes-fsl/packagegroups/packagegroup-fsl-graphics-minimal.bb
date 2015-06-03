@@ -9,6 +9,8 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=3f40d7994397109285ec7b81fdeb3
 
 inherit packagegroup
 
+XSERVER ?= ""
+
 X11_PACKAGES = "${@base_contains('DISTRO_FEATURES', 'x11', \
    'twm ${XSERVER} x11-common xclock xterm ', '', d)}"
 
