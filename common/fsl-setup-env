@@ -59,6 +59,7 @@ if [ -e ${ROOTDIR}/sources/oe-core ]; then
     OEROOTDIR=${ROOTDIR}/sources/oe-core
 fi
 FSLROOTDIR=${ROOTDIR}/sources/meta-freescale
+XTRAROOTDIR=${ROOTDIR}/sources/meta-freescale-extra
 PROJECT_DIR=${ROOTDIR}/build_${MACHINE}
 
 prompt_message () {
@@ -115,6 +116,8 @@ usage() {
     i.MX:  `ls $FSLROOTDIR/meta-imx/meta-bsp/conf/machine \
            | grep "\.conf" | sed s/\.conf//g | xargs echo`
     QorIQ: `ls $FSLROOTDIR/meta-qoriq/meta-bsp/conf/machine \
+           | grep "\.conf" | sed s/\.conf//g | xargs echo`
+    Extra:  `ls $XTRAROOTDIR/conf/machine \
            | grep "\.conf" | sed s/\.conf//g | xargs echo`
 "
     else
@@ -178,6 +181,7 @@ fi
 # Check the machine type specified
 if [ -n "${MACHINE}" ] && \
     [ -e "$FSLROOTDIR/meta-qoriq/meta-bsp/conf/machine/${MACHINE}.conf" ] || \
+    [ -e "$XTRAROOTDIR/conf/machine/${MACHINE}.conf" ] || \
     [ -e "$FSLROOTDIR/meta-imx/meta-bsp/conf/machine/${MACHINE}.conf" ]; then
     echo "Configuring for ${MACHINE} ..."
 else
@@ -203,6 +207,8 @@ LAYER_LIST=" \
     meta-freescale/meta-qoriq/meta-sdk \
     meta-freescale/meta-qoriq/meta-toolchain \
     \
+    meta-freescale-extra \
+    \
     meta-qt5 \
     meta-fsl-demos \
     meta-browser \
@@ -210,6 +216,9 @@ LAYER_LIST=" \
 "
 
 if [ -e "$FSLROOTDIR/meta-imx/meta-bsp/conf/machine/${MACHINE}.conf" ]; then
+    FSLDISTRO="fslc-imx"
+    EULA_FILE="$FSLROOTDIR/meta-imx/license/EULA"
+elif [ -e "$XTRAROOTDIR/conf/machine/${MACHINE}.conf" ]; then
     FSLDISTRO="fslc-imx"
     EULA_FILE="$FSLROOTDIR/meta-imx/license/EULA"
 elif [ -e "$FSLROOTDIR/meta-qoriq/meta-bsp/conf/machine/${MACHINE}.conf" ]; then
