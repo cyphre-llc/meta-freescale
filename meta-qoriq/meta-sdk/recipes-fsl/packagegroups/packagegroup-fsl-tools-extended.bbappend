@@ -4,7 +4,7 @@ MACHINE_SPECIFIC_p1022ds = " packagegroup-fsl-graphics-minimal"
 MACHINE_SPECIFIC_t1042rdb-pi = " packagegroup-fsl-graphics-minimal"
 MACHINE_SPECIFIC_t1042rdb-pi-64b = " packagegroup-fsl-graphics-minimal"
 
-IMAGE_INSTALL_qoriq += " \
+RDEPENDS_${PN}_append_qoriq = "\
     kernel-devicetree \
     kernel-image \
     packagegroup-fsl-monitor \

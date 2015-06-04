@@ -1,6 +1,6 @@
 
 
-IMAGE_INSTALL_append_e500v2 = " \
+RDEPENDS_${PN}_append_e500v2 = " \
     boot-format \
     boot-format-config \
 "
