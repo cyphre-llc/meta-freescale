@@ -2,6 +2,6 @@
 
 
 
-RDEPENDS_${PN}_qoriq = " \
+RDEPENDS_${PN}_append_qoriq = " \
     valgrind \
 "
