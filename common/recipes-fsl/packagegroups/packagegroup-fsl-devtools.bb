@@ -33,5 +33,5 @@ RDEPENDS_${PN} = " \
     subversion \
     tcl \
     u-boot-mkimage \
-    valgrind \
 "
+
