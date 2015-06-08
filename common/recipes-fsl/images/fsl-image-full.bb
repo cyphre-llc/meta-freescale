@@ -7,7 +7,7 @@ an embedded system for development and evaluation tasks."
 
 LICENSE = "MIT"
 
-IMAGE_INSTALL += " \
+IMAGE_INSTALL_append = " \
     packagegroup-core-buildessential \
     packagegroup-core-eclipse-debug \
     packagegroup-core-full-cmdline \
