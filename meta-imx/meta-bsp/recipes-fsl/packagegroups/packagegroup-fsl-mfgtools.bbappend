@@ -4,7 +4,7 @@
 
 DESCRIPTION = "Freescale Package group for common tools specific to i.MX."
 
-RDEPENDS_${PN} = " \
+RDEPENDS_${PN}_append_imx = " \
     coreutils \
     mmc-utils \
     fsl-rc-local \
