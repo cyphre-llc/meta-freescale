@@ -10,8 +10,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=3f40d7994397109285ec7b81fdeb3
 
 inherit packagegroup
 
-GPU_BENCHMARK = "${@base_contains('DISTRO_FEATURES', 'x11', 'glmark2 gtkperf glcompbench', \
-       base_contains('DISTRO_FEATURES', 'wayland','glmark2', '', d), d)}"
+GPU_BENCHMARK = "${@base_contains('DISTRO_FEATURES', 'x11', 'glmark2 gtkperf glcompbench','', d)}"
 
 RDEPENDS_${PN} = " \
     packagegroup-fsl-graphics-core \
