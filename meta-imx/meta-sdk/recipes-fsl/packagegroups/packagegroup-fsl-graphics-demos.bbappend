@@ -1,7 +1,10 @@
 # Copyright (C) 2015 Freescale Semiconductor
 # Released under the MIT license (see COPYING.MIT for the terms)
 
-RDEPENDS_${PN}_append_mx6 = " imx-gpu-viv-demos fsl-gpu-sdk"
+GPU_DEMOS = ""
+GPU_DEMOS_mx6 = " imx-gpu-viv-demos fsl-gpu-sdk"
+
+RDEPENDS_${PN}_append_imx = " ${GPU_DEMOS}"
 
 # FIXME: fsl-gpu-sdk is not supported for i.MX6 SoloLite due to lack of
 # OpenVG support and is intended to add in future release. 

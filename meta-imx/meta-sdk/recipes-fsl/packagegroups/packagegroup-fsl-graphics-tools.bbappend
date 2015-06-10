@@ -16,7 +16,7 @@ SOC_GPU_TOOLS_WAYLAND = ""
 
 SOC_GPU_TOOLS_DIRECTFB = ""
 
-RDEPENDS_${PN}_append = " \
+RDEPENDS_${PN}_append_imx = " \
     ${@base_contains("LICENSE_FLAGS_WHITELIST", "commercial", "opencv-samples", "", d)} \
     ${@base_contains("DISTRO_FEATURES", "x11", "${SOC_GPU_TOOLS_X11}", \
         base_contains("DISTRO_FEATURES", "wayland", "${SOC_GPU_TOOLS_WAYLAND}", \

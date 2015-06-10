@@ -22,7 +22,7 @@ DFB_TOOLS_INSTALL = ""
 DFB_TOOLS_INSTALL_mx6 = "${@base_contains('DISTRO_FEATURES', 'directfb', \
     'libvivante-dfb-mx6', '', d)}"
 
-RDEPENDS_${PN}_append = " \
+RDEPENDS_${PN}_append_imx = " \
     ${SOC_TOOLS_GPU} \
     ${DFB_TOOLS_INSTALL} \
 "
