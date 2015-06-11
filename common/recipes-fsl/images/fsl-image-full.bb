@@ -21,19 +21,5 @@ IMAGE_INSTALL_append = " \
     packagegroup-fsl-tools-extended \
 "
 
-IMAGE_INSTALL_append_imx = " \
-    packagegroup-fsl-graphics-minimal \
-    packagegroup-fsl-graphics-core \
-    packagegroup-fsl-graphics-tools \
-    packagegroup-fsl-graphics-demos \
-    packagegroup-fsl-graphics-benchmarks \
-    packagegroup-fsl-multimedia-audio \
-    packagegroup-fsl-multimedia-gstreamer1.0-core \
-    packagegroup-fsl-multimedia-gstreamer1.0-testapps \
-"
-IMAGE_INSTALL_append_qoriq = ""
-
-
-
 export IMAGE_BASENAME = "fsl-image-full"
 
