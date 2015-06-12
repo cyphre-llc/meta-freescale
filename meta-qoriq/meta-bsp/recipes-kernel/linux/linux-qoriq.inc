@@ -10,6 +10,9 @@ KSRC ?= ""
 S = '${@base_conditional("KSRC", "", "${WORKDIR}/git", "${KSRC}", d)}'
 
 DEPENDS_append = " libgcc"
+# not put uImage into /boot of rootfs, install kernel-image if needed
+RDEPENDS_kernel-base = ""
+
 KERNEL_CC_append = " ${TOOLCHAIN_OPTIONS}"
 KERNEL_LD_append = " ${TOOLCHAIN_OPTIONS}"
 
