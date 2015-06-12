@@ -3,9 +3,12 @@ DPAA_PKGS = "\
     fmc \
     qoriq-debug \
     usdpaa \
+    hypervisor-partman \
 "
 DPAA_PKGS_e500v2 = ""
 DPAA_PKGS_ls102xa = ""
+DPAA_PKGS_remove_e6500 = "hypervisor-partman"
+DPAA_PKGS_append_e6500 = " lib64-hypervisor-partman"
 
 IPC_PKGS = " \
     ipc-modules-multi \
