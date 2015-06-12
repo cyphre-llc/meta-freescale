@@ -19,9 +19,7 @@ IMAGE_INSTALL_append = " \
     packagegroup-fsl-devtools \
     packagegroup-fsl-benchmark-extended \
     packagegroup-fsl-tools-extended \
-    packagegroup-fsl-graphics-minimal \
 "
-
 
 export IMAGE_BASENAME = "fsl-image-full"
 
