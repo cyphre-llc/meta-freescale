@@ -11,7 +11,6 @@ inherit packagegroup
 
 RDEPENDS_${PN} = " \
     imx-kobs \
-    ${PN}-fslcodec-testapps \
     ${SOC_TOOLS_TEST} \
 "
 
