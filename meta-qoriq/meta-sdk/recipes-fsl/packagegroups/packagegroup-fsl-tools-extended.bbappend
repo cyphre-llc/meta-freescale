@@ -3,11 +3,12 @@ MACHINE_SPECIFIC ?= ""
 MACHINE_SPECIFIC_p1022ds = " packagegroup-fsl-graphics-minimal"
 MACHINE_SPECIFIC_t1042rdb-pi = " packagegroup-fsl-graphics-minimal"
 MACHINE_SPECIFIC_t1042rdb-pi-64b = " packagegroup-fsl-graphics-minimal"
+# cairo-dev is needed by web-sysmon
+MACHINE_SPECIFIC_t4240 = " web-sysmon cairo-dev"
 
 RDEPENDS_${PN}_append_qoriq = "\
     kernel-devicetree \
     kernel-image \
-    packagegroup-fsl-monitor \
     ${@multilib_pkg_extend(d, "binutils")} \
     ${@multilib_pkg_extend(d, "cpp")} \
     ${@multilib_pkg_extend(d, "glibc-dev")} \

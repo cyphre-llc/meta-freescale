@@ -7,6 +7,10 @@ an embedded system for development and evaluation tasks."
 
 LICENSE = "MIT"
 
+# copy the manifest and the license text for each package to image
+COPY_LIC_MANIFEST = "1"
+COPY_LIC_DIRS = "1"
+
 IMAGE_INSTALL_append = " \
     packagegroup-core-buildessential \
     packagegroup-core-eclipse-debug \
