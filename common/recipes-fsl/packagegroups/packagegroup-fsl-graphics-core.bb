@@ -22,10 +22,15 @@ WAYLAND_PACKAGES = "${@base_contains('DISTRO_FEATURES', 'x11', '', \
 
 # X11 packages
 X11_PACKAGES = "${@base_contains('DISTRO_FEATURES', 'x11', \
-   'mesa xorg-minimal-fonts', '', d)}"
+   'xorg-minimal-fonts liberation-fonts', '', d)}"
+
+#OpenGL packages
+GL_PACKAGES = "${@base_contains('DISTRO_FEATURES', 'opengl', \
+   'mesa', '', d)}"
 
 RDEPENDS_${PN} = " \
     ${DFB_PACKAGES} \
     ${WAYLAND_PACKAGES} \
     ${X11_PACKAGES} \
+    ${GL_PACKAGES} \
 "
