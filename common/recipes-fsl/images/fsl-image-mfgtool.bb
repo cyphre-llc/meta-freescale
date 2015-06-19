@@ -2,10 +2,10 @@
 
 require fsl-image-minimal.bb
 
-SUMMARY = "Small image to be used for Manufacturing"
-DESCRIPTION = "Small image which only include essetional Manufacturing \
+SUMMARY = "Small image commonly used for manufacturing or other small image needs."
+DESCRIPTION = "Small image which only includes essential manufacturing \
 packages to deploy other big images to large physical media, such as \
-usb stick, hard drive."
+a USB stick or a hard drive."
 
 LICENSE = "MIT"
 
