@@ -13,11 +13,9 @@ SOC_TOOLS_GPU_mx6 = " \
                      'xserver-xorg-extension-viv-autohdmi', '', d)} \
 "
 
-# i.MX6 SoloLite do not support apitrace because of its dependency on gles2.
+# i.MX6 SoloLite does not support apitrace because of its dependency on gles2.
+SOC_TOOLS_GPU_remove_mx6sl = "imx-gpu-viv-tools-apitrace"
 
-SOC_TOOLS_GPU_remove_mx6sl = " \
-    imx-gpu-viv-tools-apitrace \
-"
 DFB_TOOLS_INSTALL = ""
 DFB_TOOLS_INSTALL_mx6 = "${@base_contains('DISTRO_FEATURES', 'directfb', \
     'libvivante-dfb-mx6', '', d)}"
