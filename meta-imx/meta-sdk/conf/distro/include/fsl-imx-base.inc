@@ -2,9 +2,10 @@ require conf/distro/poky.conf
 
 # This is the default distro configuration.
 
+# for now use bluez4 as default
 # Comment out the 2 lines below to use bluez4.
-DISTRO_FEATURES_append_mx6 = " bluez5"
-DISTRO_FEATURES_append_mx7 = " bluez5"
+#DISTRO_FEATURES_append_mx6 = " bluez5"
+#DISTRO_FEATURES_append_mx7 = " bluez5"
 
 # Preferred Providers
 PREFERRED_PROVIDER_u-boot_mx5 = "u-boot-fslc"
