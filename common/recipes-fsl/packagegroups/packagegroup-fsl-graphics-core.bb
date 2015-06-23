@@ -25,7 +25,7 @@ X11_PACKAGES = "${@base_contains('DISTRO_FEATURES', 'x11', \
    'xorg-minimal-fonts liberation-fonts', '', d)}"
 
 #OpenGL packages
-GL_PACKAGES = "${@base_contains('DISTRO_FEATURES', 'opengl', \
+GL_PACKAGES = "${@base_contains('DISTRO_FEATURES', 'x11', \
    'mesa', '', d)}"
 
 RDEPENDS_${PN} = " \

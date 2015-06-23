@@ -15,7 +15,7 @@ WAYLAND_DEMOS = "${@base_contains('DISTRO_FEATURES', 'x11', '', \
        base_contains('DISTRO_FEATURES', 'wayland','weston-examples gtk+3-demo clutter-1.0-examples', '', d), d)}"
 
 # X11 demos that depend on OpenGL
-GL_DEMOS = "${@base_contains('DISTRO_FEATURES', 'opengl','mesa-demos', '', d)}"
+GL_DEMOS = "${@base_contains('DISTRO_FEATURES', 'x11','mesa-demos', '', d)}"
 
 RDEPENDS_${PN} = " \
     packagegroup-fsl-graphics-core \
