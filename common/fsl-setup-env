@@ -205,7 +205,6 @@ LAYER_LIST=" \
     \
     meta-freescale/meta-qoriq/meta-bsp \
     meta-freescale/meta-qoriq/meta-sdk \
-    meta-freescale/meta-qoriq/meta-toolchain \
     \
     meta-freescale-extra \
     \
