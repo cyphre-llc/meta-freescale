@@ -9,10 +9,8 @@ DISTRO_FEATURES_append_mx7 = " bluez5"
 # Preferred Providers
 PREFERRED_PROVIDER_u-boot_mx5 = "u-boot-fslc"
 PREFERRED_PROVIDER_u-boot_mx6 = "u-boot-imx"
-PREFERRED_PROVIDER_u-boot_mx7 = "u-boot-imx"
 
 PREFERRED_PROVIDER_virtual/kernel_mx6 = "linux-imx"
-PREFERRED_PROVIDER_virtual/kernel_mx7 = "linux-imx"
 
 PREFERRED_PROVIDER_virtual/libgl_mx6q = "imx-gpu-viv"
 PREFERRED_PROVIDER_virtual/libgl_mx6dl = "imx-gpu-viv"
@@ -43,27 +41,12 @@ PREFERRED_PROVIDER_virtual/libg2d_mx6 = "imx-gpu-viv"
 
 # Preferred Versions
 
-PREFERRED_VERSION_xserver-xorg_mx6 = "1.16"
-PREFERRED_VERSION_linux-libc-headers = "3.14"
-
-# set these because of meta-fsl-arm override
-PREFERRED_VERSION_xserver-xorg_mx6q = "2:1.16.1"
-PREFERRED_VERSION_xserver-xorg_mx6dl = "2:1.16.1"
-PREFERRED_VERSION_xserver-xorg_mx6s = "2:1.16.1"
-PREFERRED_VERSION_xserver-xorg_mx6sl = "2:1.16.1"
-PREFERRED_VERSION_xserver-xorg_mx6sx = "2:1.16.1"
-
 FP_TAG = "${@base_contains("TUNE_FEATURES", "callconvention-hard", "-hfp", "-sfp", d)}"
 
 PREFERRED_VERSION_imx-gpu-viv = "5.0.11.p4.4${FP_TAG}"
 PREFERRED_VERSION_xf86-video-imxfb-vivante = "5.0.11.p4.4"
 
 PREFERRED_VERSION_fsl-gpu-sdk_mx6 = "2.0"
-
-# set following because of override in meta-fsl-arm
-PREFERRED_VERSION_directfb_mx6q = "1.7.4"
-PREFERRED_VERSION_directfb_mx6dl = "1.7.4"
-PREFERRED_VERSION_directfb_mx6s = "1.7.4"
 
 PREFERRED_VERSION_imx-gpu-viv-kernel = "5.0.11.p4.4"
 
@@ -81,7 +64,6 @@ PREFERRED_VERSION_directfb-examples_mx6sl = "1.7.0"
 PREFERRED_VERSION_directfb-examples_mx6sx = "1.7.0"
 
 # Use Wayland new version
-BBMASK = "meta-fsl-arm/recipes-graphics/wayland/weston_%.bbappend"
 PREFERRED_VERSION_wayland_mx6 = "1.6.0"
 PREFERRED_VERSION_weston_mx6 = "1.6.0"
 PREFERRED_VERSION_wayland-native = "1.6.0"
@@ -105,32 +87,9 @@ PREFERRED_VERSION_gst1.0-fsl-plugin = "4.0.3"
 PREFERRED_VERSION_fsl-alsa-plugins = "1.0.25"
 PREFERRED_VERSION_gst-plugins-gl = "0.10.3"
 
-PREFERRED_VERSION_fslqtapplications = "1.0.1"
-
 PREFERRED_VERSION_imx-kobs_mx6 = "3.14.28-1.0.0"
 PREFERRED_VERSION_firmware-imx_mx6 = "3.14.28-1.0.0"
-PREFERRED_VERSION_firmware-imx_mx5 = "3.0.35-4.0.0"
-
-DEFAULTTUNE_mx6 ?= "cortexa9hf-neon"
+PREFERRED_VERSION_firmware-imx_mx5 = "3.14.28-1.0.0"
 
 PREFERRED_VERSION_imx-lib_mx5 = "11.09.02"
 PREFERRED_VERSION_imx-vpu_mx5 = "11.09.02"
-
-UBOOT_ENTRYPOINT_mx6sx = "0x80008000"
-
-KERNEL_IMAGETYPE_imx6qsabresd  = "zImage"
-KERNEL_IMAGETYPE_imx6dlsabresd = "zImage"
-KERNEL_IMAGETYPE_imx6solosabresd = "zImage"
-KERNEL_IMAGETYPE_imx6qsabreauto = "zImage"
-KERNEL_IMAGETYPE_imx6dlsabreauto = "zImage"
-KERNEL_IMAGETYPE_imx6solosabreauto = "zImage"
-KERNEL_IMAGETYPE_imx6slevk = "zImage"
-KERNEL_IMAGETYPE_imx6sxsabresd = "zImage"
-
-# add the following to force mesa dependencies since sololite uses different features of gpu
-MACHINE_SOCARCH_mx6sx = "${TUNE_PKGARCH}-mx6qdl"
-
-# QT branch stable was removed so use this branch instead
-# same branch as stable so will resolve build breaks caused by branch removal
-# affects building qtwayland
-QT_MODULE_BRANCH = "5.4"
