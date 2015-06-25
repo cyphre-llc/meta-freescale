@@ -10,15 +10,18 @@ inherit packagegroup
 
 PACKAGES = "${PN}"
 
+X11_TOOLS = "${@base_contains('DISTRO_FEATURES', 'x11', \
+    ' lsb \
+    lsbinitscripts \
+    lsbtest ', '', d)} \
+"
+
 RDEPENDS_${PN} = "\
     bc \
     chkconfig \
     cronie \
     db \
     debianutils \
-    lsb \
-    lsbinitscripts \
-    lsbtest \
     lsof \
     man \
     man-pages \
@@ -37,4 +40,6 @@ RDEPENDS_${PN} = "\
     which \
     xz  \
     zip \
+    ${X11_TOOLS} \
 "
+

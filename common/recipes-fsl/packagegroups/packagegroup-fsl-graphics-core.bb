@@ -12,25 +12,25 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 inherit packagegroup
 
 # Direct FB packages
-DFB_PACKAGES = "${@base_contains('DISTRO_FEATURES', 'directfb', \
+DFB_GRAPHICS_PACKAGES = "${@base_contains('DISTRO_FEATURES', 'directfb', \
     'packagegroup-core-full-cmdline packagegroup-core-directfb', '', d)}"
 
 # Wayland packages
 
-WAYLAND_PACKAGES = "${@base_contains('DISTRO_FEATURES', 'x11', '', \
+WAYLAND_GRAPHICS_PACKAGES = "${@base_contains('DISTRO_FEATURES', 'x11', '', \
        base_contains('DISTRO_FEATURES', 'wayland','weston weston-init', '', d),d)}"
 
 # X11 packages
-X11_PACKAGES = "${@base_contains('DISTRO_FEATURES', 'x11', \
+X11_GRAPHICS_PACKAGES = "${@base_contains('DISTRO_FEATURES', 'x11', \
    'xorg-minimal-fonts liberation-fonts', '', d)}"
 
 #OpenGL packages
-GL_PACKAGES = "${@base_contains('DISTRO_FEATURES', 'x11', \
+GL_GRAPHICS_PACKAGES = "${@base_contains('DISTRO_FEATURES', 'opengl', \
    'mesa', '', d)}"
 
 RDEPENDS_${PN} = " \
-    ${DFB_PACKAGES} \
-    ${WAYLAND_PACKAGES} \
-    ${X11_PACKAGES} \
-    ${GL_PACKAGES} \
+    ${DFB_GRAPHICS_PACKAGES} \
+    ${WAYLAND_GRAPHICS_PACKAGES} \
+    ${X11_GRAPHICS_PACKAGES} \
+    ${GL_GRAPHICS_PACKAGES} \
 "
