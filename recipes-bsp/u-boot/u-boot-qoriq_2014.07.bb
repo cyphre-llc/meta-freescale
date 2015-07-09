@@ -1,3 +1,6 @@
+require recipes-bsp/u-boot/u-boot.inc                                                                                            
+inherit fsl-u-boot-localversion
+
 DESCRIPTION = "U-boot bootloader"
 HOMEPAGE = "http://u-boot.sf.net"
 SECTION = "bootloaders"
@@ -13,12 +16,14 @@ LIC_FILES_CHKSUM = " \
 
 PV = "2014.07+fslgit"
 INHIBIT_DEFAULT_DEPS = "1"
-DEPENDS = "boot-format-native libgcc ${@base_contains('TCMODE', 'external-fsl', '', 'virtual/${TARGET_PREFIX}gcc', d)}"
+DEPENDS = "libgcc virtual/${TARGET_PREFIX}gcc"
+DEPENDS_append_qoriq-ppc = " boot-format-native"
+DEPENDS_append_qoriq-arm = " change-file-endianess-native"
 
 inherit deploy
 
 SRC_URI = "git://git.freescale.com/ppc/sdk/u-boot.git;nobranch=1 \
-	file://0001-u-boot-mpc85xx-u-boot-.lds-remove-_GLOBAL_OFFSET_TAB.patch"
+    file://0001-u-boot-mpc85xx-u-boot-.lds-remove-_GLOBAL_OFFSET_TAB.patch"
 SRCREV = "659b6a23a8b1f3026200bc6352dbacef53f4dcb1"
 
 python () {
@@ -49,31 +54,17 @@ S = '${@base_conditional("USRC", "", "${WORKDIR}/git", "${USRC}", d)}'
 
 EXTRA_OEMAKE = 'CROSS_COMPILE=${WRAP_TARGET_PREFIX} CC="${WRAP_TARGET_PREFIX}gcc ${TOOLCHAIN_OPTIONS}"'
 
-do_compile () {
+do_compile_append_qoriq-ppc () {
     unset LDFLAGS
     unset CFLAGS
     unset CPPFLAGS
 
-    if [ ! -e ${B}/.scmversion -a ! -e ${S}/.scmversion ]
-    then
-        head=`git rev-parse --verify --short HEAD 2> /dev/null`
-        printf "%s%s%s" ${UBOOT_LOCALVERSION} +g $head > ${B}/.scmversion
-        printf "%s%s%s" ${UBOOT_LOCALVERSION} +g $head > ${S}/.scmversion
-    fi
 
-    if [ "x${UBOOT_MACHINES}" = "x" ]; then
-        UBOOT_MACHINES=${UBOOT_MACHINE}
-    fi
-
-    for board in ${UBOOT_MACHINES}; do
+    for board in ${UBOOT_MACHINE}; do
         if ! grep -wq $board ${S}/boards.cfg;then
             echo "WARNING: $board not supported in boards.cfg"
             continue
         fi
-
-        oe_runmake O=${board} distclean
-        oe_runmake O=${board} ${board}_config
-        oe_runmake O=${board} all
 
         case "${board}" in
             *SDCARD*)   UBOOT_TARGET="u-boot-sd";;
@@ -126,12 +117,22 @@ do_compile () {
     done
 }
 
-do_install(){
-    if [ "x${UBOOT_MACHINES}" = "x" ]; then
-        UBOOT_MACHINES=${UBOOT_MACHINE}
-    fi
+do_compile_append_qoriq-arm () {
+     if [ "x${UBOOT_CONFIG}" != "x" ]
+     then
+         for config in ${UBOOT_MACHINE}; do
+             case "${config}" in
+                 *spi*) tclsh ${STAGING_BINDIR_NATIVE}/byte_swap.tcl ${S}/${config}/u-boot.bin ${S}/${config}/u-boot.swap.bin 8
+                 mv ${S}/${config}/u-boot.swap.bin ${S}/u-boot-${type}.${UBOOT_SUFFIX};;
+                 *sdcard*)  mv ${S}/${config}/u-boot-with-spl-pbl.bin  ${S}/${config}/u-boot.bin;;
+             esac
+         done
+     fi
+}
 
-    for board in ${UBOOT_MACHINES}; do
+do_install_append_qoriq-ppc (){
+
+    for board in ${UBOOT_MACHINE}; do
         if ! grep -wq $board ${S}/boards.cfg;then
             continue
         fi
@@ -152,12 +153,9 @@ do_install(){
     done
 }
 
-do_deploy(){
-    if [ "x${UBOOT_MACHINES}" = "x" ]; then
-        UBOOT_MACHINES=${UBOOT_MACHINE}
-    fi
+do_deploy_append_qoriq-ppc (){
 
-    for board in ${UBOOT_MACHINES}; do
+    for board in ${UBOOT_MACHINE}; do
         if ! grep -wq $board ${S}/boards.cfg;then
             continue
         fi
@@ -184,5 +182,4 @@ addtask deploy after do_install
 
 PACKAGES += "${PN}-images"
 FILES_${PN}-images += "/boot"
-
-ALLOW_EMPTY_${PN} = "1"
+COMPATIBLE_MACHINE = "(qoriq)"
