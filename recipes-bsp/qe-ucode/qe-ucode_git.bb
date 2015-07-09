@@ -4,10 +4,12 @@ LICENSE = "Freescale-EULA"
 LIC_FILES_CHKSUM = "file://EULA;md5=60037ccba533a5995e8d1a838d85799c"
 
 python () {
-    if not d.getVar("QE_UCODE", True):
-        machine = d.getVar("MACHINE", True)
-        raise bb.parse.SkipPackage("QE_UCODE not set in \
-            meta-fsl-ppc/conf/machine/%s.conf" % machine)
+        if not d.getVar("QE_UCODE", True):
+                PN = d.getVar("PN", True)
+                FILE = os.path.basename(d.getVar("FILE", True))
+                bb.debug(1, "To build %s, see %s for instructions on \
+                             setting up your qe-ucode" % (PN, FILE))
+                raise bb.parse.SkipPackage("because QE_UCODE is not set")
 }
 
 inherit deploy
@@ -26,10 +28,9 @@ do_deploy () {
     install -d ${DEPLOYDIR}/boot
     install -m 644 ${QE_UCODE} ${DEPLOYDIR}/boot/
 }
+
 addtask deploy before do_build after do_install
 
 PACKAGES += "${PN}-image"
 FILES_${PN}-image += "/boot/*"
-ALLOW_EMPTY_${PN} = "1"
-COMPATIBLE_MACHINE = "(p1021rdb|p1025twr|t1)"
-
+COMPATIBLE_MACHINE = "(p1021rdb|p1025twr|t1|ls102xa)"
