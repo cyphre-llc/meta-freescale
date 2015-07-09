@@ -39,5 +39,6 @@ SRC_URI = "git://git.freescale.com/ppc/sdk/linux.git;nobranch=1 \
     file://security-keys-CVE-2014-9529.patch \
     file://eCryptfs-CVE-2014-9683.patch \
 "
+
 SRCREV = "6619b8b55796cdf0cec04b66a71288edd3057229"
 
