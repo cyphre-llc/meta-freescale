@@ -12,7 +12,9 @@ S = "${WORKDIR}/git"
 EXTRA_OEMAKE = "CROSS_COMPILE=${TARGET_PREFIX} SYSROOT=${STAGING_DIR_TARGET}"
 export KERNEL_PATH
 
-INHIBIT_PACKAGE_STRIP = "1"
+do_compile_prepend(){
+    sed -i -e 's,EXTRA_CFLAGS += -I$(PWD),EXTRA_CFLAGS += -I${S},' ${S}/armodule/source/Makefile
+}
 
 do_install(){
 	install -d ${D}/lib/modules/${KERNEL_VERSION}
@@ -22,4 +24,6 @@ do_install(){
 }
 
 FILES_${PN} += "${bindir}/"
+INHIBIT_PACKAGE_STRIP = "1"
 
+COMPATIBLE_MACHINE = "(t1040rdb|t1040rdb-64b|t1042rdb|t1042rdb-64b|t1042rdb-pi|t1042rdb-pi-64b)"
