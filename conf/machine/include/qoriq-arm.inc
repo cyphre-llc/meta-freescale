@@ -1,0 +1,10 @@
+require conf/machine/include/qoriq.inc
+
+UBOOT_ENTRYPOINT = "0x80008000"
+
+DEFAULTTUNE = "cortexa7hf-neon"
+
+SERIAL_CONSOLES ?= "115200;ttyS0 115200;ttyS1 115200;ttyEHV0 115200;ttyLP0 115200;ttyAMA0"
+SERIAL_CONSOLES_CHECK ?= "${SERIAL_CONSOLES}"
+
+MACHINEOVERRIDES .= ":qoriq-arm"
