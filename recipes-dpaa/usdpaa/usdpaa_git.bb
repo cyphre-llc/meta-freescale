@@ -1,7 +1,6 @@
 DESCRIPTION = "User-Space Data-Path Acceleration Architecture drivers"
 LICENSE = "BSD & GPLv2"
 LIC_FILES_CHKSUM = "file://Makefile;endline=30;md5=39e58bedc879163c9338596e52df5b1f"
-PR = "r4"
 
 inherit pkgconfig
 
@@ -12,6 +11,8 @@ DEPENDS_append_b4860qds = " ipc-ust"
 DEPENDS_append_b4420qds = " ipc-ust"
 
 RDEPENDS_${PN} = "libgcc bash"
+RDEPENDS_${PN}_append_b4860qds = " ipc-ust"
+RDEPENDS_${PN}_append_b4420qds = " ipc-ust"
 
 SRC_URI = "git://git.freescale.com/ppc/sdk/usdpaa.git;nobranch=1"
 SRCREV = "d9975948bb6bf9fdcec189c0f1c31ce45f74961c"
@@ -57,6 +58,4 @@ do_install () {
 PARALLEL_MAKE_pn-${PN} = ""
 FILES_${PN} += "/root/SOURCE_THIS /usr/etc/"
 
-COMPATIBLE_HOST_qoriq-ppc = ".*"
-COMPATIBLE_HOST ?= "(none)"
-
+COMPATIBLE_MACHINE = "(qoriq-ppc)"
