@@ -1,9 +1,6 @@
 DESCRIPTION = "Frame Manager Configuration tool"
-SECTION = "fmc"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=a504ab5a8ff235e67c7301214749346c"
-
-PR = "r2"
 
 SRC_URI = "git://git.freescale.com/ppc/sdk/fmc.git;nobranch=1"
 SRCREV = "4f4a3ebe447c3c982d453596a82af7b40ac3a28a"
@@ -11,8 +8,6 @@ SRCREV = "4f4a3ebe447c3c982d453596a82af7b40ac3a28a"
 DEPENDS = "libxml2 fmlib tclap"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
-COMPATIBLE_HOST_qoriq-ppc = ".*"
-COMPATIBLE_HOST ?= "(none)"
 
 S = "${WORKDIR}/git"
 
@@ -51,3 +46,4 @@ do_install () {
 }
 
 BBCLASSEXTEND = "native"
+COMPATIBLE_MACHINE = "(qoriq-ppc)"
