@@ -17,6 +17,7 @@ KERNEL_CC_append = " ${TOOLCHAIN_OPTIONS}"
 KERNEL_LD_append = " ${TOOLCHAIN_OPTIONS}"
 
 KERNEL_EXTRA_ARGS += "LOADADDR=${UBOOT_ENTRYPOINT}"
+ZIMAGE_BASE_NAME = "zImage-${PKGE}-${PKGV}-${PKGR}-${MACHINE}-${DATETIME}"
 
 SCMVERSION ?= "y"
 DELTA_KERNEL_DEFCONFIG ?= ""
@@ -36,6 +37,18 @@ do_configure_prepend() {
     done
 
 }
+
+do_install_append_qoriq-arm() {
+    install -m 0644 arch/${ARCH}/boot/zImage ${D}/boot/zImage-${KERNEL_VERSION}
+}
+
+do_deploy_append_qoriq-arm() {
+    install -m 0644 arch/${ARCH}/boot/zImage ${DEPLOYDIR}/${ZIMAGE_BASE_NAME}.bin
+    ln -sf ${ZIMAGE_BASE_NAME}.bin ${DEPLOYDIR}/zImage-${MACHINE}.bin
+    ln -sf ${ZIMAGE_BASE_NAME}.bin ${DEPLOYDIR}/zImage
+}
+
+FILES_kernel-image += "/boot/zImage*"
 
 # make everything compatible for the time being
 COMPATIBLE_MACHINE = "(qoriq)"
