@@ -1,7 +1,7 @@
 # Copyright (C) 2015 Freescale Semiconductor
 # Released under the MIT license (see COPYING.MIT for the terms)
 
-DESCRIPTION = "Package group used by freescale to provide a set of GPU benchmark applications"
+DESCRIPTION = "Package group used by Freescale to provide a set of GPU benchmark applications"
 SUMMARY = "Freescale Package group for graphics benchmarks"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=3f40d7994397109285ec7b81fdeb3b58 \
