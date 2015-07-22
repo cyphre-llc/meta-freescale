@@ -204,10 +204,14 @@ LAYER_LIST=" \
     meta-virtualization \
 "
 
-EULA_FILE="$FSLROOTDIR/meta-imx/license/EULA"
-if [ -z "$DISTRO" ]; then
-    DISTRO="fslc"
-fi
+EULA_FILE="$FSLROOTDIR/EULA"
+
+if [ "`ls $FSLROOTDIR/conf/machine $XTRAROOTDIR/conf/machine \
+       | grep "\.conf" | egrep "^imx|^twr" | grep ${MACHINE} | wc -l`" != "0" ]; then
+    DISTRO="fslc-imx"
+elif [ "`ls $FSLROOTDIR/conf/machine $XTRAROOTDIR/conf/machine \
+       | grep "\.conf" | egrep -v "^imx|^twr" | grep ${MACHINE} | wc -l`" != "0" ]; then
+    DISTRO="fsl-qoriq"
 
 # set default jobs and threads
 CPUS=`grep -c processor /proc/cpuinfo`
