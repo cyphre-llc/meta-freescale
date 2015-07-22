@@ -10,14 +10,11 @@ inherit packagegroup
 
 PACKAGES = "${PN}"
 
-X11_VIRT_PACKAGES = "${@base_contains('DISTRO_FEATURES', 'x11', \
+RDEPENDS_${PN} = "${@base_contains('DISTRO_FEATURES', 'x11', \
     'libvirt \
     libvirt-libvirtd \
     libvirt-virsh \
     lxc \
     qemu', \
     '', d)} \
-"
-RDEPENDS_${PN} = " \
-    ${X11_VIRT_PACKAGES} \
-"
+" 
