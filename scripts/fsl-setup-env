@@ -3,7 +3,6 @@
 #
 # Copyright (C) 2012, 2013 O.S. Systems Software LTDA.
 # Authored-by:  Otavio Salvador <otavio@ossystems.com.br>
-# Copyright (C) 2015 Freescale Semiconductor
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as
@@ -60,7 +59,7 @@ if [ -e ${ROOTDIR}/sources/oe-core ]; then
     OEROOTDIR=${ROOTDIR}/sources/oe-core
 fi
 FSLROOTDIR=${ROOTDIR}/sources/meta-freescale
-XTRAROOTDIR=${ROOTDIR}/sources/meta-freescale-extra
+EXTRAROOTDIR=${ROOTDIR}/sources/meta-freescale-extra
 PROJECT_DIR=${ROOTDIR}/build_${MACHINE}
 
 prompt_message () {
@@ -84,7 +83,7 @@ Common targets are:
     meta-ide-support
 "
     echo "Targets specific to Freescale targets:"
-    for i in `ls $FSLROOTDIR/meta-*/recipes-*/images/*.bb 2>/dev/null`;do
+    for i in `ls $FSLROOTDIR/recipes-*/images/*.bb 2>/dev/null`;do
         i=`basename $i`;i=`echo $i |sed -e 's,^\(.*\)\.bb,\1,'`
         echo "    $i";
     done
@@ -96,7 +95,7 @@ Common targets are:
 clean_up()
 {
    unset PROGNAME ROOTDIR OEROOTDIR FSLROOTDIR PROJECT_DIR \
-         EULA EULA_FILE LAYER_LIST MACHINE FSLDISTRO \
+         EULA EULA_FILE LAYER_LIST MACHINE FSLDISTRO EXTRAROOTDIR \
          OLD_OPTIND CPUS JOBS THREADS DOWNLOADS CACHES \
          setup_flag setup_h setup_j setup_t setup_l setup_builddir \
          setup_download setup_sstate setup_error layer append_layer
@@ -113,7 +112,7 @@ usage() {
            | egrep "^imx|^twr" | sed s/\.conf//g | xargs echo`
     QorIQ: `ls $FSLROOTDIR/conf/machine | grep "\.conf" \
            | egrep -v "^imx|^twr" | sed s/\.conf//g | xargs echo`
-    Extra:  `ls $XTRAROOTDIR/conf/machine \
+    Extra:  `ls $EXTRAROOTDIR/conf/machine \
            | grep "\.conf" | sed s/\.conf//g | xargs echo`
 "
     else
@@ -177,7 +176,7 @@ fi
 # Check the machine type specified
 if [ -n "${MACHINE}" ] && \
     [ -e "$FSLROOTDIR/conf/machine/${MACHINE}.conf" ] || \
-    [ -e "$XTRAROOTDIR/conf/machine/${MACHINE}.conf" ]; then
+    [ -e "$EXTRAROOTDIR/conf/machine/${MACHINE}.conf" ]; then
     echo "Configuring for ${MACHINE} ..."
 else
     echo -e "\nThe \$MACHINE you have specified ($MACHINE) is not supported by this build setup."
@@ -194,7 +193,6 @@ LAYER_LIST=" \
     meta-openembedded/meta-webserver \
     \
     meta-freescale \
-    meta-freescale \
     \
     meta-freescale-extra \
     \
@@ -206,12 +204,13 @@ LAYER_LIST=" \
 
 EULA_FILE="$FSLROOTDIR/EULA"
 
-if [ "`ls $FSLROOTDIR/conf/machine $XTRAROOTDIR/conf/machine \
+if [ "`ls $FSLROOTDIR/conf/machine $EXTRAROOTDIR/conf/machine \
        | grep "\.conf" | egrep "^imx|^twr" | grep ${MACHINE} | wc -l`" != "0" ]; then
     DISTRO="fslc-imx"
-elif [ "`ls $FSLROOTDIR/conf/machine $XTRAROOTDIR/conf/machine \
+elif [ "`ls $FSLROOTDIR/conf/machine $EXTRAROOTDIR/conf/machine \
        | grep "\.conf" | egrep -v "^imx|^twr" | grep ${MACHINE} | wc -l`" != "0" ]; then
     DISTRO="fsl-qoriq"
+fi
 
 # set default jobs and threads
 CPUS=`grep -c processor /proc/cpuinfo`
