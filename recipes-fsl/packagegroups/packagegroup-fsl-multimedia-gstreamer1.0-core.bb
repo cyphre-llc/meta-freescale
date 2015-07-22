@@ -21,6 +21,7 @@ RDEPENDS_${PN} += " \
     ${MACHINE_GSTREAMER_1_0_PLUGIN} \
 "
 
+# Open source plugins specifiec by i.MX
 IMX_GSTREAMER_1_0_EXTRA_INSTALL = " \
     gstreamer1.0-plugins-bad-meta \
     gstreamer1.0-rtsp-server \
