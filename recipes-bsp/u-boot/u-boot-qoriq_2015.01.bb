@@ -14,7 +14,7 @@ LIC_FILES_CHKSUM = " \
     file://Licenses/lgpl-2.1.txt;md5=4fbd65380cdd255951079008b364516c \
 "
 
-PV = "2014.07+fslgit"
+PV = "2015.01+fslgit"
 INHIBIT_DEFAULT_DEPS = "1"
 DEPENDS = "libgcc virtual/${TARGET_PREFIX}gcc"
 DEPENDS_append_qoriq-ppc = " boot-format-native"
@@ -24,7 +24,7 @@ inherit deploy
 
 SRC_URI = "git://git.freescale.com/ppc/sdk/u-boot.git;nobranch=1 \
     file://0001-u-boot-mpc85xx-u-boot-.lds-remove-_GLOBAL_OFFSET_TAB.patch"
-SRCREV = "659b6a23a8b1f3026200bc6352dbacef53f4dcb1"
+SRCREV = "6ba8eedbcdc4b063f59a63e6288b938af739e8ad"
 
 python () {
     if d.getVar("TCMODE", True) == "external-fsl":
@@ -59,7 +59,7 @@ do_compile_append_qoriq-ppc () {
     unset CFLAGS
     unset CPPFLAGS
 
-
+    python ./tools/genboardscfg.py
     for board in ${UBOOT_MACHINE}; do
         if ! grep -wq $board ${S}/boards.cfg;then
             echo "WARNING: $board not supported in boards.cfg"
