@@ -1,6 +1,6 @@
 DESCRIPTION = "pkc host driver"
-LICENSE = "GPLv2"
-LIC_FILES_CHKSUM = "file://Makefile;endline=30;md5=6a26ed8e76a8ea2e019c525369ed0f03"
+LICENSE = "BSD & GPLv2+"
+LIC_FILES_CHKSUM = "file://COPYING;md5=99803d8e9a595c0bdb45ca710f353813"
 
 inherit module qoriq_build_64bit_kernel
 RDEPENDS_${PN} += "cryptodev-module bc"
