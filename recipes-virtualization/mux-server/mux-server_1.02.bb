@@ -3,10 +3,10 @@ LICENSE = "LGPL-2.1"
 # TODO: add a dedicated COPYING file
 LIC_FILES_CHKSUM = "file://mux_server.c;endline=9;md5=e59eeb0812bb88b7af2d932f2dc22aed"
 
-SRC_URI = "http://git.freescale.com/source/mux-server-${PV}.tar.gz;name=mux_server"
+SRC_URI = "git://git.freescale.com/ppc/sdk/hypervisor/mux_server.git;branch=master"
+SRCREV = "3e4c6a44a81bb5cf2996830e8034d26850f80efc"
 
-SRC_URI[mux_server.md5sum] = "0f8650c65d1774563a8e4990ddb76f3e"
-SRC_URI[mux_server.sha256sum] = "73409daf2f4821a5b7f292043ed6bb082a48dacd5d3b126184aed71f7d52a613"
+S = "${WORKDIR}/git"
 
 EXTRA_OEMAKE='HOSTCC="${CC}"'
 
