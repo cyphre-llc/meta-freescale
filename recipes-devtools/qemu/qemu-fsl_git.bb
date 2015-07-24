@@ -3,20 +3,11 @@ require recipes-devtools/qemu/qemu.inc
 LIC_FILES_CHKSUM = "file://COPYING;md5=441c28d2cf86e15a37fa47e15a72fbac \
                     file://COPYING.LIB;endline=24;md5=c04def7ae38850e7d3ef548588159913"
 
-# This means QEMU v1.7 with FSL specific patches applied
-PV = "1.7+${SRCPV}"
+# This means QEMU v2.2.0 with FSL specific patches applied
+PV = "2.2.0+${SRCPV}"
 
-# NOTE: these options are note available in qemu 1.7, but qemu.inc assumes
-# version 2.0+ where they are available. For now we unset them, but we should
-# remove the following lines when upgrading to qemu 2.0+:
-PACKAGECONFIG[quorum] = ""
-PACKAGECONFIG[lzo]    = ""
-PACKAGECONFIG[numa]   = ""
-PACKAGECONFIG[gtk+]   = ""
-
-SRC_URI = "git://git.freescale.com/ppc/sdk/qemu.git;branch=sdk-v1.7.x \
-"
-SRCREV = "6ac4597c059d35e2737b234747243e56d340f4db"
+SRC_URI = "git://git.freescale.com/ppc/sdk/qemu.git;branch=master"
+SRCREV = "00ac004143e9fe46944a1885b04268fcd3a95a3a"
 
 S = "${WORKDIR}/git"
 
