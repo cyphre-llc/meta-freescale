@@ -1,7 +1,7 @@
 require recipes-bsp/u-boot/u-boot.inc                                                                                            
 inherit fsl-u-boot-localversion
 
-DESCRIPTION = "U-boot bootloader"
+DESCRIPTION = "U-boot provided by Freescale with focus on QorIQ boards"
 HOMEPAGE = "http://u-boot.sf.net"
 SECTION = "bootloaders"
 PROVIDES = "virtual/bootloader u-boot"
@@ -18,7 +18,7 @@ PV = "2015.01+fslgit"
 INHIBIT_DEFAULT_DEPS = "1"
 DEPENDS = "libgcc virtual/${TARGET_PREFIX}gcc"
 DEPENDS_append_qoriq-ppc = " boot-format-native"
-DEPENDS_append_qoriq-arm = " change-file-endianess-native"
+DEPENDS_append_qoriq-arm = " change-file-endianess-native dtc-native"
 
 inherit deploy
 
@@ -122,9 +122,9 @@ do_compile_append_qoriq-arm () {
      then
          for config in ${UBOOT_MACHINE}; do
              case "${config}" in
-                 *spi*) tclsh ${STAGING_BINDIR_NATIVE}/byte_swap.tcl ${S}/${config}/u-boot.bin ${S}/${config}/u-boot.swap.bin 8
+                 *spi*) tclsh ${STAGING_BINDIR_NATIVE}/byte_swap.tcl ${S}/${config}/u-boot-dtb.bin ${S}/${config}/u-boot.swap.bin 8
                  mv ${S}/${config}/u-boot.swap.bin ${S}/u-boot-${type}.${UBOOT_SUFFIX};;
-                 *sdcard*)  mv ${S}/${config}/u-boot-with-spl-pbl.bin  ${S}/${config}/u-boot.bin;;
+                 *nand* | *sdcard*) mv ${S}/${config}/u-boot-with-spl-pbl.bin ${S}/${config}/u-boot.bin;;
              esac
          done
      fi
