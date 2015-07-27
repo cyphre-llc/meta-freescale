@@ -16,7 +16,6 @@ DFB_GRAPHICS_PACKAGES = "${@base_contains('DISTRO_FEATURES', 'directfb', \
     'packagegroup-core-full-cmdline packagegroup-core-directfb', '', d)}"
 
 # Wayland packages
-
 WAYLAND_GRAPHICS_PACKAGES = "${@base_contains('DISTRO_FEATURES', 'x11', '', \
        base_contains('DISTRO_FEATURES', 'wayland','weston weston-init', '', d),d)}"
 
