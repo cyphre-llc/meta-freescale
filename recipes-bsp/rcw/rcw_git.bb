@@ -7,32 +7,23 @@ DEPENDS_qoriq-arm += "change-file-endianess-native"
 
 inherit deploy
 
-SRCBRANCH = "sdk-v1.7.x"
-SRCREV = "3e89f378ed70e9b856756de8c3dbdfccb045fa0c"
+SRCBRANCH = "master"
+SRCREV = "426f7a6535d93dac76f5125035e0938a85e778d2"
 SRC_URI = "git://git.freescale.com/ppc/sdk/rcw.git;branch=${SRCBRANCH} \
     file://rcw-make-BOARDS-DESTDIR-overidable-in-Makefile.patch \
 "
 
 S = "${WORKDIR}/git"
 
+EXTRA_OEMAKE = "BOARDS=${@d.getVar('MACHINE', True).replace('-64b','')} DESTDIR=${D}/boot/rcw/"
+
 do_install () {
     oe_runmake install
-
-    M=`echo ${MACHINE} | sed s/-64b//g`
-    if [ "t1042rdb" = "${M}" ] || [ "t1042rdb-pi" = "${M}" ];then
-        M=t1042rdb_pi
-    fi
-    install -d ${D}/boot/rcw
-    cp -r ${S}/${M}/${M}/* ${D}/boot/rcw
 }
 
 do_deploy () {
-    M=`echo ${MACHINE} | sed s/-64b//g`
-    if [ "t1042rdb" = "${M}" ] || [ "t1042rdb-pi" = "${M}" ];then
-        M=t1042rdb_pi
-    fi
     install -d ${DEPLOYDIR}/rcw
-    cp -r ${S}/${M}/${M}/* ${DEPLOYDIR}/rcw
+    cp -r ${D}/boot/rcw/* ${DEPLOYDIR}/rcw/
 }
 addtask deploy after do_install
 
