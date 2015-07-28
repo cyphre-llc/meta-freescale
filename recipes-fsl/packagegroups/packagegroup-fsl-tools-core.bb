@@ -35,8 +35,7 @@ RDEPENDS_${PN} = " \
     sysstat \
 "
 
-DPAA_PKGS = ""
-DPAA_PKGS_qoriq = " \
+DPAA_PKGS = " \
     eth-config \
     fmc \
     qoriq-debug \
