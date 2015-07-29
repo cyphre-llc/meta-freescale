@@ -96,7 +96,7 @@ clean_up()
 {
    unset PROGNAME ROOTDIR OEROOTDIR FSLROOTDIR PROJECT_DIR \
          EULA EULA_FILE LAYER_LIST MACHINE FSLDISTRO EXTRAROOTDIR \
-         OLD_OPTIND CPUS JOBS THREADS DOWNLOADS CACHES \
+         OLD_OPTIND CPUS JOBS THREADS DOWNLOADS CACHES DISTRO \
          setup_flag setup_h setup_j setup_t setup_l setup_builddir \
          setup_download setup_sstate setup_error layer append_layer
    unset -f usage prompt_message
@@ -206,10 +206,14 @@ EULA_FILE="$FSLROOTDIR/EULA"
 
 if [ "`ls $FSLROOTDIR/conf/machine $EXTRAROOTDIR/conf/machine \
        | grep "\.conf" | egrep "^imx|^twr" | grep ${MACHINE} | wc -l`" != "0" ]; then
-    DISTRO="fslc-imx"
+    FSLDISTRO="fslc-imx"
 elif [ "`ls $FSLROOTDIR/conf/machine $EXTRAROOTDIR/conf/machine \
        | grep "\.conf" | egrep -v "^imx|^twr" | grep ${MACHINE} | wc -l`" != "0" ]; then
     DISTRO="fsl-qoriq"
+fi
+
+if [ -z "$DISTRO" ]; then
+    DISTRO="$FSLDISTRO"
 fi
 
 # set default jobs and threads
