@@ -20,7 +20,7 @@ RDEPENDS_${PN} += " \
 
 IMX_GSTREAMER_1_0_TESTAPPS = " \
     ${@base_contains("MACHINE_GSTREAMER_1_0_PLUGIN", "gst1.0-fsl-plugin", \
-         "gst1.0-fsl-plugin-gplay gst1.0-fsl-plugin-grecorder", "", d)} \
+         "gst1.0-fsl-plugin-gplay", "", d)} \
 "
 
 MACHINE_GSTREAMER_1_0_TESTAPPS_mx6 = "${IMX_GSTREAMER_1_0_TESTAPPS}"
