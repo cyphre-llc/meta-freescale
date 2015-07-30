@@ -18,7 +18,7 @@ PV = "2015.01+fslgit"
 INHIBIT_DEFAULT_DEPS = "1"
 DEPENDS = "libgcc virtual/${TARGET_PREFIX}gcc"
 DEPENDS_append_qoriq-ppc = " boot-format-native"
-DEPENDS_append_qoriq-arm = " change-file-endianess-native dtc-native"
+DEPENDS_append_qoriq-arm = " change-file-endianess-native dtc-native tcl-native"
 
 inherit deploy
 
