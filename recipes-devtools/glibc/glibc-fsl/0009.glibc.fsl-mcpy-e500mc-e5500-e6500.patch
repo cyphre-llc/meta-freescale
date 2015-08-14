@@ -1,0 +1,1065 @@
+# Problem Statement:
+  Implement target specific optimized memcpy for e500mc,
+  32-bit e5500/e6500, 64-bit e5500/6500
+
+# Owned by:
+  Rohit [based on 'C' implementation by Ruchika Gupta & Vakul Garg]
+
+# Actions:
+  * Add optimized memcpy library functions for e500mc/e5500/e6500 targets.
+
+diff -Naur glibc-2.20/sysdeps/powerpc/powerpc32/e500mc/memcpy.S glibc-2.20-mcpy/sysdeps/powerpc/powerpc32/e500mc/memcpy.S
+--- glibc-2.20/sysdeps/powerpc/powerpc32/e500mc/memcpy.S	1969-12-31 18:00:00.000000000 -0600
++++ glibc-2.20-mcpy/sysdeps/powerpc/powerpc32/e500mc/memcpy.S	2015-07-08 04:05:44.598952006 -0500
+@@ -0,0 +1,266 @@
++/* Optimized memcpy implementation for e500mc PowerPC.
++   Copyright (C) 2015 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, write to the Free
++   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
++   02111-1307 USA.  */
++
++#include <sysdep.h>
++
++/* __ptr_t [r3] memcpy (__ptr_t dst [r3], __ptr_t src [r4], size_t len [r5]);
++   Returns 'dst'.
++
++	 r3 = destination
++	 r4 = source
++	 r5 = byte count
++
++	 volatile fixed point registers usable:
++	 r0, r3-r12
++
++	 volatile floating point registers usable:
++	 f0-f13.  */
++
++EALIGN (memcpy, 5, 0)
++	cmplw	cr0, r4, r3		/* if source==destination, return.  */
++	beqlr	cr0
++	/* if number of bytes is less than 8, (optimal value TBD),
++	   but greater than zero copy byte-by-byte.  */
++	cmplwi	r5, 8
++	mr	r6, r3
++	blt	L(copy_bytes)
++	neg	r0, r4
++	andi.	r11, r0, 7
++	beq	L(src_aligned)
++	lwz	r0, 0(r4)
++	lwz	r12, 4(r4)
++	subf	r5, r11, r5
++	add	r4, r4, r11
++	stw	r0, 0(r6)
++	stw	r12, 4(r6)
++	add	r6, r6, r11
++L(src_aligned):
++	cmplwi	7, r5, 63
++	ble	7, L(copy_remaining)
++	srwi	r11, r5, 6		/* No of 64 byte copy count.  */
++	rlwinm	r5, r5, 0, 26, 31	/* remaining bytes.  */
++	rlwinm.	r0, r6, 0, 29, 31
++	mtctr	r11
++	bne	0, L(dst_naligned)
++L(copy_dalign):
++#ifndef _SOFT_FLOAT
++	lfd	0, 0(r4)
++	lfd	1, 8(r4)
++	lfd	2, 16(r4)
++	lfd	3, 24(r4)
++	stfd	0, 0(r6)
++	stfd	1, 8(r6)
++	stfd	2, 16(r6)
++	stfd	3, 24(r6)
++	lfd	0, 32(r4)
++	lfd	1, 40(r4)
++	lfd	2, 48(r4)
++	lfd	3, 56(r4)
++	addi	r4, r4, 64
++	stfd	0, 32(r6)
++	stfd	1, 40(r6)
++	stfd	2, 48(r6)
++	stfd	3, 56(r6)
++#else
++	lwz	r0, 0(r4)
++	lwz	r8, 4(r4)
++	lwz	r9, 8(r4)
++	stw	r0, 0(r6)
++	stw	r8, 4(r6)
++	stw	r9, 8(r6)
++	lwz	r0, 12(r4)
++	lwz	r8, 16(r4)
++	lwz	r9, 20(r4)
++	stw	r0, 12(r6)
++	stw	r8, 16(r6)
++	stw	r9, 20(r6)
++	lwz	r0, 24(r4)
++	lwz	r8, 28(r4)
++	lwz	r9, 32(r4)
++	stw	r0, 24(r6)
++	stw	r8, 28(r6)
++	stw	r9, 32(r6)
++	lwz	r0, 36(r4)
++	lwz	r8, 40(r4)
++	lwz	r9, 44(r4)
++	stw	r0, 36(r6)
++	stw	r8, 40(r6)
++	stw	r9, 44(r6)
++	lwz	r0, 48(r4)
++	lwz	r8, 52(r4)
++	lwz	r9, 56(r4)
++	stw	r0, 48(r6)
++	lwz	r0, 60(r4)
++	addi	r4, r4, 64
++	stw	r8, 52(r6)
++	stw	r9, 56(r6)
++	stw	r0, 60(r6)
++#endif
++	addi	r6, r6, 64
++	bdnz	L(copy_dalign)
++L(copy_remaining):
++	srwi.	r11, r5, 3		/* No of 8 byte copy count.  */
++	rlwinm	r5, r5, 0, 29, 31	/* remaining bytes.  */
++	beq	0, L(copy_bytes)
++	mtcrf	0x01, r11
++	bf	cr7*4+1, L(cp16b)
++	lwz	r0, 0(r4)		/* copy 32 bytes.  */
++	lwz	r7, 4(r4)
++	lwz	r8, 8(r4)
++	lwz	r9, 12(r4)
++	stw	r0, 0(r6)
++	stw	r7, 4(r6)
++	stw	r8, 8(r6)
++	stw	r9, 12(r6)
++	lwz	r0, 16(r4)
++	lwz	r7, 20(r4)
++	lwz	r8, 24(r4)
++	lwz	r9, 28(r4)
++	addi	r4, r4, 32
++	stw	r0, 16(r6)
++	stw	r7, 20(r6)
++	stw	r8, 24(r6)
++	stw	r9, 28(r6)
++	addi	r6, r6, 32
++L(cp16b):
++	bf	cr7*4+2, L(cp8b)
++	lwz	r0, 0(r4)		/* copy 16 bytes.  */
++	lwz	r7, 4(r4)
++	lwz	r8, 8(r4)
++	lwz	r9, 12(r4)
++	addi	r4, r4, 16
++	stw	r0, 0(r6)
++	stw	r7, 4(r6)
++	stw	r8, 8(r6)
++	stw	r9, 12(r6)
++	addi	r6, r6, 16
++L(cp8b):
++	bf	cr7*4+3, L(copy_bytes)
++	lwz	r0, 0(r4)		/* copy 8 bytes.  */
++	lwz	r7, 4(r4)
++	addi	r4, r4, 8
++	stw	r0, 0(r6)
++	stw	r7, 4(r6)
++	addi	r6, r6, 8
++L(copy_bytes):
++	cmplwi	cr1, r5, 4
++	cmplwi	cr0, r5, 1
++	bgt	cr1, L(gt4b)		/* nb > 4?  (5, 6, 7 bytes).  */
++	ble	cr0, L(lt1b)		/* nb <= 1? (0, 1 bytes).  */
++	addi	r0, r5, -2		/* 2, 3, 4 bytes.  */
++	lhz	r9, 0(r4)
++	lhzx	r11, r4, r0
++	sth	r9, 0(r6)
++	sthx	r11, r6, r0
++	blr
++L(gt4b):
++	addi	r0, r5, -4		/* 5, 6, 7 bytes.  */
++	lwz	r9, 0(r4)
++	lwzx	r11, r4, r0
++	stw	r9, 0(r6)
++	stwx	r11, r6, r0
++	blr
++L(lt1b):
++	mtocrf	0x1, r5			/* nb == 0 ? return.  */
++	bflr	31
++	lbz	r0, 0(r4)		/* nb == 1.  */
++	stb	r0, 0(r6)
++	blr
++
++L(dst_naligned):
++	rlwinm.	r0, r6, 0, 30, 31
++	beq	0, L(copy_dalign4)
++L(copy_dnalign):
++	lwz	r0, 0(r4)		/* copy 64 bytes.  */
++	lwz	r8, 4(r4)
++	lwz	r9, 8(r4)
++	stw	r0, 0(r6)
++	stw	r8, 4(r6)
++	stw	r9, 8(r6)
++	lwz	r0, 12(r4)
++	lwz	r8, 16(r4)
++	lwz	r9, 20(r4)
++	stw	r0, 12(r6)
++	stw	r8, 16(r6)
++	stw	r9, 20(r6)
++	lwz	r0, 24(r4)
++	lwz	r8, 28(r4)
++	lwz	r9, 32(r4)
++	stw	r0, 24(r6)
++	stw	r8, 28(r6)
++	stw	r9, 32(r6)
++	lwz	r0, 36(r4)
++	lwz	r8, 40(r4)
++	lwz	r9, 44(r4)
++	stw	r0, 36(r6)
++	stw	r8, 40(r6)
++	stw	r9, 44(r6)
++	lwz	r0, 48(r4)
++	lwz	r8, 52(r4)
++	lwz	r9, 56(r4)
++	stw	r0, 48(r6)
++	lwz	r0, 60(r4)
++	addi	r4, r4, 64
++	stw	r8, 52(r6)
++	stw	r9, 56(r6)
++	stw	r0, 60(r6)
++	addi	r6, r6, 64
++	bdnz	L(copy_dnalign)
++	b	L(copy_remaining)
++
++L(copy_dalign4):
++	lwz	r0, 0(r4)
++	lwz	r7, 4(r4)
++	lwz	r8, 8(r4)
++	lwz	r9, 12(r4)
++	stw	r0, 0(r6)
++	stw	r7, 4(r6)
++	stw	r8, 8(r6)
++	stw	r9, 12(r6)
++	lwz	r0, 16(r4)
++	lwz	r7, 20(r4)
++	lwz	r8, 24(r4)
++	lwz	r9, 28(r4)
++	stw	r0, 16(r6)
++	stw	r7, 20(r6)
++	stw	r8, 24(r6)
++	stw	r9, 28(r6)
++	lwz	r0, 32(r4)
++	lwz	r7, 36(r4)
++	lwz	r8, 40(r4)
++	lwz	r9, 44(r4)
++	stw	r0, 32(r6)
++	stw	r7, 36(r6)
++	stw	r8, 40(r6)
++	stw	r9, 44(r6)
++	lwz	r0, 48(r4)
++	lwz	r7, 52(r4)
++	lwz	r8, 56(r4)
++	lwz	r9, 60(r4)
++	addi	r4, r4, 64
++	stw	r0, 48(r6)
++	stw	r7, 52(r6)
++	stw	r8, 56(r6)
++	stw	r9, 60(r6)
++	addi	r6, r6, 64
++	bdnz	L(copy_dalign4)
++	b	L(copy_remaining)
++
++END (memcpy)
++libc_hidden_builtin_def (memcpy)
+diff -Naur glibc-2.20/sysdeps/powerpc/powerpc32/e5500/memcpy.S glibc-2.20-mcpy/sysdeps/powerpc/powerpc32/e5500/memcpy.S
+--- glibc-2.20/sysdeps/powerpc/powerpc32/e5500/memcpy.S	1969-12-31 18:00:00.000000000 -0600
++++ glibc-2.20-mcpy/sysdeps/powerpc/powerpc32/e5500/memcpy.S	2015-07-08 04:05:44.598952006 -0500
+@@ -0,0 +1,239 @@
++/* Optimized memcpy implementation for e5500 32-bit PowerPC.
++   Copyright (C) 2015 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, write to the Free
++   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
++   02111-1307 USA.  */
++
++#include <sysdep.h>
++
++/* __ptr_t [r3] memcpy (__ptr_t dst [r3], __ptr_t src [r4], size_t len [r5]);
++   Returns 'dst'.
++
++	 r3 = destination
++	 r4 = source
++	 r5 = byte count
++
++	 volatile fixed point registers usable:
++	 r0, r3-r12
++
++	 volatile floating point registers usable:
++	 f0-f13.  */
++
++EALIGN (memcpy, 5, 0)
++	cmplw	cr0, r4, r3		/* if source==destination, return.  */
++	beqlr	cr0
++	/* if number of bytes is less than 8, (optimal value TBD),
++	   but greater than zero copy byte-by-byte.  */
++	cmplwi	r5, 8
++	mr	r6, r3
++	blt	L(copy_bytes)
++	neg	r0, r4
++	andi.	r11, r0, 3
++	beq	L(src_align4)
++	lwz	r12, 0(r4)
++	subf	r5, r11, r5
++	add	r4, r4, r11
++	stw	r12, 0(r6)
++	add	r6, r6, r11
++L(src_align4):
++	cmplwi	7, r5, 63
++	ble	7, L(copy_remaining)
++	andi.	r10, r0, 15
++	beq	L(src_aligned16)
++	subf.	r10, r11, r10
++	beq	0, L(src_aligned16)
++	srwi	r11, r10, 2
++	subf	r5, r10, r5
++	mtctr	r11
++L(copy_salign16):
++	lwz	0, 0(r4)
++	addi	r4, r4, 4
++	stw	0, 0(r6)
++	addi	r6, r6, 4
++	bdnz	L(copy_salign16)
++L(src_aligned16):
++	srwi.	r11, r5, 6		/* No of 64 byte copy count.  */
++	beq	0, L(copy_remaining)
++	rlwinm	r5, r5, 0, 26, 31	/* remaining bytes.  */
++	rlwinm.	r0, r6, 0, 29, 31
++	mtctr	r11
++	bne	0, L(copy_dnalign)
++L(copy_dalign):
++#ifndef _SOFT_FLOAT
++	lfd	0, 0(r4)		/* copy 64 bytes.  */
++	lfd	1, 8(r4)
++	lfd	2, 16(r4)
++	lfd	3, 24(r4)
++	stfd	0, 0(r6)
++	stfd	1, 8(r6)
++	stfd	2, 16(r6)
++	stfd	3, 24(r6)
++	lfd	0, 32(r4)
++	lfd	1, 40(r4)
++	lfd	2, 48(r4)
++	lfd	3, 56(r4)
++	addi	r4, r4, 64
++	stfd	0, 32(r6)
++	stfd	1, 40(r6)
++	stfd	2, 48(r6)
++	stfd	3, 56(r6)
++	addi	r6, r6, 64
++#else
++	lwz	r0, 0(r4)
++	lwz	r7, 4(r4)
++	lwz	r8, 8(r4)
++	lwz	r9, 12(r4)
++	stw	r0, 0(r6)
++	stw	r7, 4(r6)
++	stw	r8, 8(r6)
++	stw	r9, 12(r6)
++	lwz	r0, 16(r4)
++	lwz	r7, 20(r4)
++	lwz	r8, 24(r4)
++	lwz	r9, 28(r4)
++	stw	r0, 16(r6)
++	stw	r7, 20(r6)
++	stw	r8, 24(r6)
++	stw	r9, 28(r6)
++	lwz	r0, 32(r4)
++	lwz	r7, 36(r4)
++	lwz	r8, 40(r4)
++	lwz	r9, 44(r4)
++	stw	r0, 32(r6)
++	stw	r7, 36(r6)
++	stw	r8, 40(r6)
++	stw	r9, 44(r6)
++	lwz	r0, 48(r4)
++	lwz	r7, 52(r4)
++	lwz	r8, 56(r4)
++	lwz	r9, 60(r4)
++	addi	r4, r4, 64
++	stw	r0, 48(r6)
++	stw	r7, 52(r6)
++	stw	r8, 56(r6)
++	stw	r9, 60(r6)
++	addi	r6, r6, 64
++#endif
++	bdnz	L(copy_dalign)
++L(copy_remaining):
++	srwi.	r11, r5, 3		/* No of 8 byte copy count.  */
++	rlwinm	r5, r5, 0, 29, 31	/* remaining bytes.  */
++	beq	0, L(copy_bytes)
++	mtcrf	0x01, r11
++	bf	cr7*4+1, L(cp16b)
++	lwz	r0, 0(r4)		/* copy 32 bytes.  */
++	lwz	r7, 4(r4)
++	lwz	r8, 8(r4)
++	lwz	r9, 12(r4)
++	stw	r0, 0(r6)
++	stw	r7, 4(r6)
++	stw	r8, 8(r6)
++	stw	r9, 12(r6)
++	lwz	r0, 16(r4)
++	lwz	r7, 20(r4)
++	lwz	r8, 24(r4)
++	lwz	r9, 28(r4)
++	addi	r4, r4, 32
++	stw	r0, 16(r6)
++	stw	r7, 20(r6)
++	stw	r8, 24(r6)
++	stw	r9, 28(r6)
++	addi	r6, r6, 32
++L(cp16b):
++	bf	cr7*4+2, L(cp8b)
++	lwz	r0, 0(r4)		/* copy 16 bytes.  */
++	lwz	r7, 4(r4)
++	lwz	r8, 8(r4)
++	lwz	r9, 12(r4)
++	addi	r4, r4, 16
++	stw	r0, 0(r6)
++	stw	r7, 4(r6)
++	stw	r8, 8(r6)
++	stw	r9, 12(r6)
++	addi	r6, r6, 16
++L(cp8b):
++	bf	cr7*4+3, L(copy_bytes)
++	lwz	r0, 0(r4)		/* copy 8 bytes.  */
++	lwz	r7, 4(r4)
++	addi	r4, r4, 8
++	stw	r0, 0(r6)
++	stw	r7, 4(r6)
++	addi	r6, r6, 8
++L(copy_bytes):
++	cmplwi	cr1, r5, 4
++	cmplwi	cr0, r5, 1
++	bgt	cr1, L(gt4b)		/* nb > 4?  (5, 6, 7 bytes).  */
++	ble	cr0, L(lt1b)		/* nb <= 1? (0, 1 bytes).  */
++	addi	r0, r5, -2		/* 2, 3, 4 bytes.  */
++	lhz	r9, 0(r4)
++	lhzx	r11, r4, r0
++	sth	r9, 0(r6)
++	sthx	r11, r6, r0
++	blr
++L(gt4b):
++	addi	r0, r5, -4		/* 5, 6, 7 bytes.  */
++	lwz	r9, 0(r4)
++	lwzx	r11, r4, r0
++	stw	r9, 0(r6)
++	stwx	r11, r6, r0
++	blr
++L(lt1b):
++	mtocrf	0x1, r5			/* nb == 0 ? return.  */
++	bflr	31
++	lbz	r0, 0(r4)		/* nb == 1.  */
++	stb	r0, 0(r6)
++	blr
++
++L(copy_dnalign):
++	lwz	r0, 0(r4)		/* copy 64 bytes.  */
++	lwz	r7, 4(r4)
++	lwz	r8, 8(r4)
++	lwz	r9, 12(r4)
++	stw	r0, 0(r6)
++	stw	r7, 4(r6)
++	stw	r8, 8(r6)
++	stw	r9, 12(r6)
++	lwz	r0, 16(r4)
++	lwz	r7, 20(r4)
++	lwz	r8, 24(r4)
++	lwz	r9, 28(r4)
++	stw	r0, 16(r6)
++	stw	r7, 20(r6)
++	stw	r8, 24(r6)
++	stw	r9, 28(r6)
++	lwz	r0, 32(r4)
++	lwz	r7, 36(r4)
++	lwz	r8, 40(r4)
++	lwz	r9, 44(r4)
++	stw	r0, 32(r6)
++	stw	r7, 36(r6)
++	stw	r8, 40(r6)
++	stw	r9, 44(r6)
++	lwz	r0, 48(r4)
++	lwz	r7, 52(r4)
++	lwz	r8, 56(r4)
++	lwz	r9, 60(r4)
++	addi	r4, r4, 64
++	stw	r0, 48(r6)
++	stw	r7, 52(r6)
++	stw	r8, 56(r6)
++	stw	r9, 60(r6)
++	addi	r6, r6, 64
++	bdnz	L(copy_dnalign)
++	b	L(copy_remaining)
++
++END (memcpy)
++libc_hidden_builtin_def (memcpy)
+diff -Naur glibc-2.20/sysdeps/powerpc/powerpc32/e6500/memcpy.S glibc-2.20-mcpy/sysdeps/powerpc/powerpc32/e6500/memcpy.S
+--- glibc-2.20/sysdeps/powerpc/powerpc32/e6500/memcpy.S	1969-12-31 18:00:00.000000000 -0600
++++ glibc-2.20-mcpy/sysdeps/powerpc/powerpc32/e6500/memcpy.S	2015-07-08 04:19:10.032952006 -0500
+@@ -0,0 +1,212 @@
++/* Optimized memcpy implementation for e6500 32-bit PowerPC.
++   Copyright (C) 2015 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, write to the Free
++   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
++   02111-1307 USA.  */
++
++#include <sysdep.h>
++
++/* __ptr_t [r3] memcpy (__ptr_t dst [r3], __ptr_t src [r4], size_t len [r5]);
++   Returns 'dst'.
++
++	 r3 = destination
++	 r4 = source
++	 r5 = byte count
++
++	 volatile fixed point registers usable:
++	 r0, r3-r12
++
++	 volatile floating point registers usable:
++	 f0-f13.  */
++
++EALIGN (memcpy, 5, 0)
++	cmplw	cr0, r4, r3		/* if source==destination, return.  */
++	beqlr	cr0
++	/* if number of bytes is less than 16, (optimal value TBD),
++	   but greater than zero copy byte-by-byte.  */
++	cmplwi	r5, 16
++	mr	r6, r3
++	blt	L(copy_remaining)
++	neg	r0, r3
++	andi.	r11, r0, 15
++	beq	L(dst_align16)
++	lwz	r0, 0(r4)
++	lwz	r7, 4(r4)
++	lwz	r8, 8(r4)
++	lwz	r9, 12(r4)
++	subf	r5, r11, r5
++	add	r4, r4, r11
++	stw	r0, 0(r6)
++	stw	r7, 4(r6)
++	stw	r8, 8(r6)
++	stw	r9, 12(r6)
++	add	r6, r6, r11
++L(dst_align16):
++	cmplwi	7, r5, 63
++	ble	7, L(copy_remaining)
++	srwi	r11, r5, 6		/* No of 64 byte copy count.  */
++	rlwinm	r5, r5, 0, 26, 31	/* remaining bytes.  */
++	rlwinm.	r0, r4, 0, 28, 31
++	mtctr	r11
++	li	r7, 16
++	li	r8, 32
++	li	r9, 48
++	bne	0, L(src_naligned)
++L(copy_salign16):
++	lvx	v14, 0, r4		/* copy 64 bytes.  */
++	lvx	v15, r7, r4
++	lvx	v16, r8, r4
++	lvx	v17, r9, r4
++	addi	r4, r4, 64
++	stvx	v14, 0, r6
++	stvx	v15, r7, r6
++	stvx	v16, r8, r6
++	stvx	v17, r9, r6
++	addi	r6, r6, 64
++	bdnz	L(copy_salign16)
++L(copy_remaining):
++	srwi.	r11, r5, 3		/* No of 8 byte copy count.  */
++	rlwinm	r5, r5, 0, 29, 31	/* remaining bytes.  */
++	beq	0, L(copy_bytes)
++	mtcrf	0x01, r11
++	bf	cr7*4+1, L(cp16b)
++
++	lwz	r0, 0(r4)		/* copy 32 bytes */
++	lwz	r7, 4(r4)
++	lwz	r8, 8(r4)
++	lwz	r9, 12(r4)
++
++	stw	r0, 0(r6)
++	stw	r7, 4(r6)
++	stw	r8, 8(r6)
++	stw	r9, 12(r6)
++
++	lwz	r0, 16(r4)
++	lwz	r7, 20(r4)
++	lwz	r8, 24(r4)
++	lwz	r9, 28(r4)
++	addi	r4, r4, 32
++
++	stw	r0, 16(r6)
++	stw	r7, 20(r6)
++	stw	r8, 24(r6)
++	stw	r9, 28(r6)
++	addi r6, r6, 32
++L(cp16b):
++	bf	cr7*4+2, L(cp8b)
++	lwz	r0, 0(r4)		/* copy 16 bytes */
++	lwz	r7, 4(r4)
++	lwz	r8, 8(r4)
++	lwz	r9, 12(r4)
++
++	addi	r4, r4, 16
++
++	stw	r0, 0(r6)
++	stw	r7, 4(r6)
++	stw	r8, 8(r6)
++	stw	r9, 12(r6)
++	addi	r6, r6, 16
++L(cp8b):
++	bf	cr7*4+3, L(copy_bytes)
++	lwz	r0, 0(r4)		/* copy 8 bytes */
++	lwz	r7, 4(r4)
++	addi	r4, r4, 8
++
++	stw	r0, 0(r6)
++	stw	r7, 4(r6)
++	addi	r6, r6, 8
++L(copy_bytes):
++	cmplwi	cr1, r5, 4
++	cmplwi	cr0, r5, 1
++	bgt	cr1, L(gt4b)		/* nb > 4?  (5, 6, 7 bytes).  */
++	ble	cr0, L(lt1b)		/* nb <= 1? (0, 1 bytes).  */
++	addi	r0, r5, -2		/* 2, 3, 4 bytes.  */
++	lhz	r9, 0(r4)
++	lhzx	r11, r4, r0
++	sth	r9, 0(r6)
++	sthx	r11, r6, r0
++	blr
++L(gt4b):
++	addi	r0, r5, -4		/* 5, 6, 7 bytes.  */
++	lwz	r9, 0(r4)
++	lwzx	r11, r4, r0
++	stw	r9, 0(r6)
++	stwx	r11, r6, r0
++	blr
++L(lt1b):
++	mtocrf	0x1, r5			/* nb == 0 ? return.  */
++	bflr	31
++	lbz	r0, 0(r4)		/* nb == 1.  */
++	stb	r0, 0(r6)
++	blr
++
++L(src_naligned):
++#ifndef _SOFT_FLOAT
++	rlwinm.	r0, r4, 0, 29, 31
++	beq	0, L(copy_salign8)
++#endif
++L(copy_snalign):			/* copy 64 bytes.  */
++	lvx	v0, 0, r4		/* load MSQ.  */
++	lvsl	v18, 0, r4		/* set permute control vector.  */
++	lvx	v19, r7, r4		/* load LSQ.  */
++	vperm	v14, v0, v19, v18	/* align the data.  */
++	lvx	v0, r7, r4		/* load MSQ.  */
++	lvsl	v18, r7, r4		/* set permute control vector.  */
++	lvx	v19, r8, r4		/* load LSQ.  */
++	vperm	v15, v0, v19, v18	/* align the data.  */
++	lvx	v0, r8, r4		/* load MSQ.  */
++	lvsl	v18, r8, r4		/* set permute control vector.  */
++	lvx	v19, r9, r4		/* load LSQ.  */
++	vperm	v16, v0, v19, v18	/* align the data.  */
++	lvx	v0, r9, r4		/* load MSQ.  */
++	lvsl	v18, r9, r4		/* set permute control vector.  */
++	addi	r4, r4, 64
++	lvx	v19, 0, r4		/* load LSQ.  */
++	vperm	v17, v0, v19, v18	/* align the data.  */
++	stvx	v14, 0, r6
++	stvx	v15, r7, r6
++	stvx	v16, r8, r6
++	stvx	v17, r9, r6
++	addi	r6, r6, 64
++	bdnz	L(copy_snalign)
++	b	L(copy_remaining)
++
++#ifndef _SOFT_FLOAT
++L(copy_salign8):
++	lfd	0, 0(r4)		/* copy 64 bytes.  */
++	lfd	1, 8(r4)
++	lfd	2, 16(r4)
++	lfd	3, 24(r4)
++	stfd	0, 0(r6)
++	stfd	1, 8(r6)
++	stfd	2, 16(r6)
++	stfd	3, 24(r6)
++	lfd	0, 32(r4)
++	lfd	1, 40(r4)
++	lfd	2, 48(r4)
++	lfd	3, 56(r4)
++	addi	r4, r4, 64
++	stfd	0, 32(r6)
++	stfd	1, 40(r6)
++	stfd	2, 48(r6)
++	stfd	3, 56(r6)
++	addi	r6, r6, 64
++	bdnz	L(copy_salign8)
++	b	L(copy_remaining)
++#endif
++
++END (memcpy)
++libc_hidden_builtin_def (memcpy)
+diff -Naur glibc-2.20/sysdeps/powerpc/powerpc64/e5500/memcpy.S glibc-2.20-mcpy/sysdeps/powerpc/powerpc64/e5500/memcpy.S
+--- glibc-2.20/sysdeps/powerpc/powerpc64/e5500/memcpy.S	1969-12-31 18:00:00.000000000 -0600
++++ glibc-2.20-mcpy/sysdeps/powerpc/powerpc64/e5500/memcpy.S	2015-07-08 04:05:44.599952006 -0500
+@@ -0,0 +1,134 @@
++/* Optimized memcpy implementation for e5500 64-bit PowerPC.
++   Copyright (C) 2015 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, write to the Free
++   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
++   02111-1307 USA.  */
++
++#include <sysdep.h>
++
++/* __ptr_t [r3] memcpy (__ptr_t dst [r3], __ptr_t src [r4], size_t len [r5]);
++   Returns 'dst'.
++
++	 r3 = destination
++	 r4 = source
++	 r5 = byte count
++
++	 volatile fixed point registers usable:
++	 r0, r3-r12
++
++	 volatile floating point registers usable:
++	 f0-f13.  */
++
++EALIGN (memcpy, 5, 0)
++	CALL_MCOUNT 3
++	cmpld	cr0, r4, r3		/* if source==destination, return.  */
++	beqlr	cr0
++	/* if number of bytes is less than 8 but greater than zero,
++	   copy byte-by-byte.  */
++	cmpldi	r5, 8
++	mr	r6, r3
++	blt	L(copy_bytes)
++	neg	r0, r4
++	andi.	r11, r0, 7
++	beq	L(src_aligned)
++	ld	r12, 0(r4)
++	subf	r5, r11, r5
++	add	r4, r4, r11
++	std	r12, 0(r6)
++	add	r6, r6, r11
++L(src_aligned):
++	cmpldi	7, r5, 63
++	ble	7, L(copy_remaining)
++	srwi	r11, r5, 6		/* No of 64 byte copy count.  */
++	rlwinm.	r5, r5, 0, 26, 31	/* remaining bytes.  */
++	mtctr	r11
++L(copy_salign):
++	ld	r0, 0(r4)		/* 64-byte copy.  */
++	ld	r7, 8(r4)
++	ld	r8, 16(r4)
++	ld	r9, 24(r4)
++	std	r0, 0(r6)
++	std	r7, 8(r6)
++	std	r8, 16(r6)
++	std	r9, 24(r6)
++	ld	r0, 32(r4)
++	ld	r7, 40(r4)
++	ld	r8, 48(r4)
++	ld	r9, 56(r4)
++	addi	r4, r4, 64
++	std	r0, 32(r6)
++	std	r7, 40(r6)
++	std	r8, 48(r6)
++	std	r9, 56(r6)
++	addi	r6, r6, 64
++	bdnz	L(copy_salign)
++L(copy_remaining):
++	srwi.	r11, r5, 3		/* No of 8 byte copy count.  */
++	rlwinm	r5, r5, 0, 29, 31	/* remaining bytes.  */
++	beq	0, L(copy_bytes)
++	mtcrf	0x01, r11
++	bf	cr7*4+1, L(cp16b)
++	ld	r0, 0(r4)		/* copy 32 bytes.  */
++	ld	r7, 8(r4)
++	ld	r8, 16(r4)
++	ld	r9, 24(r4)
++	addi	r4, r4, 32
++	std	r0, 0(r6)
++	std	r7, 8(r6)
++	std	r8, 16(r6)
++	std	r9, 24(r6)
++	addi	r6, r6, 32
++L(cp16b):
++	bf	cr7*4+2, L(cp8b)
++	ld	r7, 0(r4)		/* copy 16 bytes.  */
++	ld	r8, 8(r4)
++	addi	r4, r4, 16
++	std	r7, 0(r6)
++	std	r8, 8(r6)
++	addi	r6, r6, 16
++L(cp8b):
++	bf	cr7*4+3, L(copy_bytes)
++	ld	r7, 0(r4)		/* copy 8 bytes.  */
++	addi	r4, r4, 8
++	std	r7, 0(r6)
++	addi	r6, r6, 8
++L(copy_bytes):
++	cmpldi	cr1, r5, 4
++	cmpldi	cr0, r5, 1
++	bgt	cr1, L(gt4b)		/* nb > 4?  (5, 6, 7 bytes).  */
++	ble	cr0, L(lt1b)		/* nb <= 1? (0, 1 bytes).  */
++	addi	r0, r5, -2		/* 2, 3, 4 bytes.  */
++	lhz	r9, 0(r4)
++	lhzx	r11, r4, r0
++	sth	r9, 0(r6)
++	sthx	r11, r6, r0
++	blr
++L(gt4b):
++	addi	r0, r5, -4		/* 5, 6, 7 bytes.  */
++	lwz	r9, 0(r4)
++	lwzx	r11, r4, r0
++	stw	r9, 0(r6)
++	stwx	r11, r6, r0
++	blr
++L(lt1b):
++	mtocrf	0x1, r5			/* nb == 0 ? return.  */
++	bflr	31
++	lbz	r0, 0(r4)		/* nb == 1.  */
++	stb	r0, 0(r6)
++	blr
++
++END_GEN_TB (memcpy,TB_TOCLESS)
++libc_hidden_builtin_def (memcpy)
+diff -Naur glibc-2.20/sysdeps/powerpc/powerpc64/e6500/memcpy.S glibc-2.20-mcpy/sysdeps/powerpc/powerpc64/e6500/memcpy.S
+--- glibc-2.20/sysdeps/powerpc/powerpc64/e6500/memcpy.S	1969-12-31 18:00:00.000000000 -0600
++++ glibc-2.20-mcpy/sysdeps/powerpc/powerpc64/e6500/memcpy.S	2015-07-08 04:05:44.599952006 -0500
+@@ -0,0 +1,184 @@
++/* Optimized memcpy implementation for e6500 64-bit PowerPC.
++   Copyright (C) 2015 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, write to the Free
++   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
++   02111-1307 USA.  */
++
++#include <sysdep.h>
++
++/* __ptr_t [r3] memcpy (__ptr_t dst [r3], __ptr_t src [r4], size_t len [r5]);
++   Returns 'dst'.
++
++	 r3 = destination
++	 r4 = source
++	 r5 = byte count
++
++	 volatile fixed point registers usable:
++	 r0, r3-r12
++
++	 volatile floating point registers usable:
++	 f0-f13.  */
++
++EALIGN (memcpy, 5, 0)
++	CALL_MCOUNT 3
++	cmpld	cr0, r4, r3		/* if source==destination, return.  */
++	beqlr	cr0
++	/* if number of bytes is less than 16 but greater than zero,
++	   copy byte-by-byte.  */
++	cmpldi	r5, 16
++	mr	r6, r3
++	ble	L(copy_remaining)
++	neg	r0, r3
++	andi.	r11, r0, 15
++	beq	L(dst_align)
++	ld	r12, 0(r4)
++	ld	r0, 8(r4)
++	subf	r5, r11, r5
++	add	r4, r4, r11
++	std	r12, 0(r6)
++	std	r0, 8(r6)
++	add	r6, r6, r11
++L(dst_align):
++	cmpldi	7, r5, 63
++	ble	7, L(copy_remaining)
++	srwi	r11, r5, 6		/* No of 64 byte copy count.  */
++	rlwinm	r5, r5, 0, 26, 31	/* remaining bytes.  */
++	rlwinm.	r0, r4, 0, 28, 31
++	mtctr	r11
++	li	r7, 16
++	li	r8, 32
++	li	r9, 48
++	bne	0, L(src_naligned)
++L(copy_salign):
++	lvx	v14, 0, r4
++	lvx	v15, r7, r4
++	lvx	v16, r8, r4
++	lvx	v17, r9, r4
++	addi	r4, r4, 64
++	stvx	v14, 0, r6
++	stvx	v15, r7, r6
++	stvx	v16, r8, r6
++	stvx	v17, r9, r6
++	addi	r6, r6, 64
++	bdnz	L(copy_salign)
++L(copy_remaining):
++	srwi.	r11, r5, 3		/* No of 8 byte copy count.  */
++	rlwinm	r5, r5, 0, 29, 31	/* remaining bytes.  */
++	beq	0, L(copy_bytes)
++	mtcrf	0x01, r11
++	bf	cr7*4+1, L(cp16b)
++	ld	r0, 0(r4)		/* copy 32 bytes.  */
++	ld	r7, 8(r4)
++	ld	r8, 16(r4)
++	ld	r9, 24(r4)
++	addi	r4, r4, 32
++	std	r0, 0(r6)
++	std	r7, 8(r6)
++	std	r8, 16(r6)
++	std	r9, 24(r6)
++	addi	r6, r6, 32
++L(cp16b):
++	bf	cr7*4+2, L(cp8b)
++	ld	r7, 0(r4)		/* copy 16 bytes.  */
++	ld	r8, 8(r4)
++	addi	r4, r4, 16
++	std	r7, 0(r6)
++	std	r8, 8(r6)
++	addi	r6, r6, 16
++L(cp8b):
++	bf	cr7*4+3, L(copy_bytes)
++	ld	r7, 0(r4)		/* copy 8 bytes.  */
++	addi	r4, r4, 8
++	std	r7, 0(r6)
++	addi	r6, r6, 8
++L(copy_bytes):
++	cmpldi	cr1, r5, 4
++	cmpldi	cr0, r5, 1
++	bgt	cr1, L(gt4b)		/* nb > 4?  (5, 6, 7 bytes).  */
++	ble	cr0, L(lt1b)		/* nb <= 1? (0, 1 bytes).  */
++	addi	r0, r5, -2		/* 2, 3, 4 bytes.  */
++	lhz	r9, 0(r4)
++	lhzx	r11, r4, r0
++	sth	r9, 0(r6)
++	sthx	r11, r6, r0
++	blr
++L(gt4b):
++	addi	r0, r5, -4		/* 5, 6, 7 bytes.  */
++	lwz	r9, 0(r4)
++	lwzx	r11, r4, r0
++	stw	r9, 0(r6)
++	stwx	r11, r6, r0
++	blr
++L(lt1b):
++	mtocrf	0x1, r5			/* nb == 0 ? return.  */
++	bflr	31
++	lbz	r0, 0(r4)		/* nb == 1.  */
++	stb	r0, 0(r6)
++	blr
++
++L(src_naligned):
++	rlwinm.	r0, r4, 0, 29, 31
++	beq	0, L(copy_salign8)
++L(copy_snalign):
++	lvx	v0, 0, r4		/* load MSQ.  */
++	lvsl	v18, 0, r4		/* set permute control vector.  */
++	lvx	v19, r7, r4		/* load LSQ.  */
++	vperm	v14, v0, v19, v18	/* align the data.  */
++	lvx	v0, r7, r4		/* load MSQ.  */
++	lvsl	v18, r7, r4		/* set permute control vector.  */
++	lvx	v19, r8, r4		/* load LSQ.  */
++	vperm	v15, v0, v19, v18	/* align the data.  */
++	lvx	v0, r8, r4		/* load MSQ.  */
++	lvsl	v18, r8, r4		/* set permute control vector.  */
++	lvx	v19, r9, r4		/* load LSQ.  */
++	vperm	v16, v0, v19, v18	/* align the data.  */
++	lvx	v0, r9, r4		/* load MSQ.  */
++	lvsl	v18, r9, r4		/* set permute control vector.  */
++	addi	r4, r4, 64
++	lvx	v19, 0, r4		/* load LSQ.  */
++	vperm	v17, v0, v19, v18	/* align the data.  */
++	stvx	v14, 0, r6
++	stvx	v15, r7, r6
++	stvx	v16, r8, r6
++	stvx	v17, r9, r6
++	addi	r6, r6, 64
++	bdnz	L(copy_snalign)
++	b	L(copy_remaining)
++
++L(copy_salign8):
++	ld	r0, 0(r4)
++	ld	r7, 8(r4)
++	ld	r8, 16(r4)
++	ld	r9, 24(r4)
++	std	r0, 0(r6)
++	std	r7, 8(r6)
++	std	r8, 16(r6)
++	std	r9, 24(r6)
++	ld	r0, 32(r4)
++	ld	r7, 40(r4)
++	ld	r8, 48(r4)
++	ld	r9, 56(r4)
++	addi	r4, r4, 64
++	std	r0, 32(r6)
++	std	r7, 40(r6)
++	std	r8, 48(r6)
++	std	r9, 56(r6)
++	addi	r6, r6, 64
++	bdnz	L(copy_salign8)
++	b	L(copy_remaining)
++
++END_GEN_TB (memcpy,TB_TOCLESS)
++libc_hidden_builtin_def (memcpy)
