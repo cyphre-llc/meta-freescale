@@ -52,9 +52,12 @@ SRC_URI_qoriq-ppc = "\
     file://0020-optional-libstdc.patch \
     file://0023-Use-the-defaults.h-in-B-instead-of-S-and-t-oe-in-B.patch \
     file://0029-Define-GLIBC_DYNAMIC_LINKER-and-UCLIBC_DYNAMIC_LINKE.patch \
+    file://0032-libtool.patch \
     file://0034-Use-the-multilib-config-files-from-B-instead-of-usin.patch \
+    file://0041-libtool-avoid-libdir.patch \
     file://0046-libatomic-deptracking.patch \
     file://0049-Enable-SPE-AltiVec-generation-on-powepc-linux-target.patch \
+    file://0054-gcc-Makefile.in-fix-parallel-building-failure.patch \
 "
 SRC_URI[md5sum] = "4df8ee253b7f3863ad0b86359cd39c43"
 SRC_URI[sha256sum] = "2020c98295856aa13fda0f2f3a4794490757fc24bcca918d52cc8b4917b972dd"
