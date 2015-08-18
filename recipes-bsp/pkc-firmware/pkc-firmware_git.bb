@@ -10,7 +10,9 @@ inherit deploy
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-SRC_URI = "git://git.freescale.com/ppc/sdk/pkc-firmware.git;nobranch=1"
+SRC_URI = "git://git.freescale.com/ppc/sdk/pkc-firmware.git;nobranch=1 \
+    file://0001-u-boot-mpc85xx-u-boot-.lds-remove-_GLOBAL_OFFSET_TAB.patch \
+"
 SRCREV = "b891873c1eea7a7d53f9472ea601712897cb17b7"
 
 S = "${WORKDIR}/git"
