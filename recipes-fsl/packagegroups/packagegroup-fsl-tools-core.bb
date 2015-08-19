@@ -40,6 +40,8 @@ DPAA_PKGS = " \
     fmc \
     qoriq-debug \
     usdpaa \
+    usdpaa-apps \
+    dpa-offload \
     hypervisor-partman \
 "
 DPAA_PKGS_e500v2 = ""
