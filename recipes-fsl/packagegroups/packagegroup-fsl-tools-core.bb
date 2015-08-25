@@ -77,35 +77,10 @@ RDEPENDS_${PN}_append_p4080ds = " \
     skmm-host \
 "
 
-RDEPENDS_${PN}_append_t1040rdb = " \
+RDEPENDS_${PN}_append_t1040 = " \
     ar \
     ceetm \
     uio-seville \
-"
-
-RDEPENDS_${PN}_append_t1040rdb-64b = " \
-    ar \
-    ceetm \
-    uio-seville \
-"
-
-RDEPENDS_${PN}_append_t1042rdb = " \
-    ar \
-    ceetm \
-    uio-seville \
-"
-
-RDEPENDS_${PN}_append_t1042rdb-64b = " \
-    ar \
-    ceetm \
-    uio-seville \
-"
-
-RDEPENDS_${PN}_append_t1042rdb-pi = " \
-    ar \
-"
-RDEPENDS_${PN}_append_t1042rdb-pi-64b = " \
-    ar \
 "
 
 RDEPENDS_${PN}_append_t4240qds = " \
