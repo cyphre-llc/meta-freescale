@@ -1,8 +1,8 @@
 require gcc-fsl.inc
 
-DEPENDS += "nativesdk-isl nativesdk-cloog"
-RDEPENDS_${PN} += "nativesdk-isl nativesdk-cloog"
+DEPENDS_append_qoriq-ppc = " nativesdk-isl nativesdk-cloog"
+RDEPENDS_${PN}_append_qoriq-ppc = " nativesdk-isl nativesdk-cloog"
 
-EXTRA_OECONF += "--with-isl=${STAGING_DIR_HOST}${SDKPATHNATIVE}${prefix_nativesdk} \
+EXTRA_OECONF_append_qoriq-ppc = " --with-isl=${STAGING_DIR_HOST}${SDKPATHNATIVE}${prefix_nativesdk} \
                  --with-cloog=${STAGING_DIR_HOST}${SDKPATHNATIVE}${prefix_nativesdk} \
 "
