@@ -26,4 +26,4 @@ do_install(){
 FILES_${PN} += "${bindir}/"
 INHIBIT_PACKAGE_STRIP = "1"
 
-COMPATIBLE_MACHINE = "(t1040rdb|t1040rdb-64b|t1042rdb|t1042rdb-64b|t1042rdb-pi|t1042rdb-pi-64b)"
+COMPATIBLE_MACHINE = "(t1040|t1042)"
