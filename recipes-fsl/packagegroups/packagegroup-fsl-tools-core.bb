@@ -83,6 +83,12 @@ RDEPENDS_${PN}_append_t1040 = " \
     uio-seville \
 "
 
+RDEPENDS_${PN}_append_t1042 = " \
+    ar \
+    ceetm \
+    uio-seville \
+"
+
 RDEPENDS_${PN}_append_t4240qds = " \
     ${@base_contains('DISTRO_FEATURES', 'c29x_pkc', 'pkc-host', '', d)} \
     skmm-ep \
