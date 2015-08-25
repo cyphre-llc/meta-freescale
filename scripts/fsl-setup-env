@@ -193,6 +193,7 @@ LAYER_LIST=" \
     meta-openembedded/meta-webserver \
     \
     meta-freescale \
+    meta-freescale-internal \
     \
     meta-freescale-extra \
     \
