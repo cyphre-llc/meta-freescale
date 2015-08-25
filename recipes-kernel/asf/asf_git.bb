@@ -28,6 +28,6 @@ do_install(){
     cp -rf ${S}/../scripts ${D}/${libexecdir}/
 }
 
-FILES_${PN} += "${libexecdir} /lib/modules/${KERNEL_VERSION}/asf"
+FILES_${PN} += "${libexecdir}"
 INHIBIT_PACKAGE_STRIP = "1"
 COMPATIBLE_MACHINE = "(qoriq)"
