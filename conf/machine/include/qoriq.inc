@@ -20,4 +20,4 @@ UBINIZE_ARGS ??= "-m 512 -p 16KiB -s 512"
 
 USE_VT ?= "0"
 
-MACHINEOVERRIDES .= ":qoriq"
+MACHINEOVERRIDES =. "qoriq:"
