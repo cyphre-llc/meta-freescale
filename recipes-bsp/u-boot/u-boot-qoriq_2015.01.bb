@@ -58,10 +58,6 @@ S = '${@base_conditional("USRC", "", "${WORKDIR}/git", "${USRC}", d)}'
 EXTRA_OEMAKE = 'CROSS_COMPILE=${WRAP_TARGET_PREFIX} CC="${WRAP_TARGET_PREFIX}gcc ${TOOLCHAIN_OPTIONS}"'
 
 do_compile_append_qoriq-ppc () {
-    unset LDFLAGS
-    unset CFLAGS
-    unset CPPFLAGS
-
     python ./tools/genboardscfg.py
     for board in ${UBOOT_MACHINE}; do
         if ! grep -wq $board ${S}/boards.cfg;then
