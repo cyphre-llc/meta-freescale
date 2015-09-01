@@ -1,0 +1,30 @@
+From 57d07747e3f6659a5c0711dcf4f5b86fef4db817 Mon Sep 17 00:00:00 2001
+From: Yuanjie Huang <yuanjie.huang@windriver.com>
+Date: Mon, 6 Jul 2015 05:35:58 +0000
+Subject: [PATCH] PowerPC fix strcmp() on E500 CPU
+
+* sysdeps/powerpc/powerpc32/e500/strcmp.S
+(unaligned_last_was_first): Only check for NULs in low part of r7.
+
+Upstream: Inappropriate [embedded-specific]
+
+Signed-off-by: Yuanjie Huang <yuanjie.huang@windriver.com>
+---
+ sysdeps/powerpc/powerpc32/e500/strcmp.S | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sysdeps/powerpc/powerpc32/e500/strcmp.S b/sysdeps/powerpc/powerpc32/e500/strcmp.S
+index 2ed1612..a6d52ba 100644
+--- a/sysdeps/powerpc/powerpc32/e500/strcmp.S
++++ b/sysdeps/powerpc/powerpc32/e500/strcmp.S
+@@ -618,7 +618,7 @@ L(unaligned_last_was_first):
+         evandc r9,r11,r7
+         evand r9,r3,r9
+         evcmpgtu 5,r9,r0
+-        bt 22,L(found_early_null)
++        bt 21,L(found_early_null)
+ 
+         /* Now load the next 2 words of r4, and realign the
+ 	 * data to r10.  Then branch out if any of the bytes
+-- 
+1.8.3.4
