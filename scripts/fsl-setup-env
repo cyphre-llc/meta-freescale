@@ -191,6 +191,7 @@ LAYER_LIST=" \
     meta-openembedded/meta-python \
     meta-openembedded/meta-filesystems \
     meta-openembedded/meta-webserver \
+    meta-openembedded/toolchain-layer \
     \
     meta-freescale \
     meta-freescale-internal \
@@ -201,6 +202,7 @@ LAYER_LIST=" \
     meta-fsl-demos \
     meta-browser \
     meta-virtualization \
+    meta-linaro/meta-linaro-toolchain \
 "
 
 EULA_FILE="$FSLROOTDIR/EULA"
