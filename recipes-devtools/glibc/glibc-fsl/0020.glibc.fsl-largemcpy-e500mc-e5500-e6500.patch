@@ -1,22 +1,6 @@
-# Problem Statement:
-  Implement target specific optimized largememcpy for e500mc,
-  64-bit e5500.
-
-# Owned by:
-  Rohit [based on 'C' implementation by Ruchika Gupta & Vakul Garg]
-
-# Actions  
-  * For e500mc and e5500 [64-bit] targets, we have a separate version of memcpy
-    which makes use of cache management instructions.
-  
-  * The cache management version of memcpy is called 'largememcpy'.
-  
-  * For application portability, we have created an memcpy alias (largememcpy)
-    for all other targets that do not have specific largememcpy definition.
-
-diff -Naur glibc-2.20-orig/include/string.h glibc-2.20-largemcpy/include/string.h
---- glibc-2.20-orig/include/string.h	2015-03-12 09:20:07.396952006 -0500
-+++ glibc-2.20-largemcpy/include/string.h	2015-03-12 09:20:26.315952756 -0500
+diff -ruN glibc-2.20-mcpy-new-large-original/include/string.h glibc-2.20-mcpy-new-large-mcpy-new/include/string.h
+--- glibc-2.20-mcpy-new-large-original/include/string.h	2015-09-02 14:28:58.404187000 -0500
++++ glibc-2.20-mcpy-new-large-mcpy-new/include/string.h	2015-09-02 14:30:49.773187000 -0500
 @@ -70,6 +70,9 @@
      }))
  #endif
@@ -27,9 +11,9 @@ diff -Naur glibc-2.20-orig/include/string.h glibc-2.20-largemcpy/include/string.
  libc_hidden_proto (__mempcpy)
  libc_hidden_proto (__stpcpy)
  libc_hidden_proto (__stpncpy)
-diff -Naur glibc-2.20-orig/string/string.h glibc-2.20-largemcpy/string/string.h
---- glibc-2.20-orig/string/string.h	2015-03-12 09:20:06.901952004 -0500
-+++ glibc-2.20-largemcpy/string/string.h	2015-03-12 09:20:26.316952707 -0500
+diff -ruN glibc-2.20-mcpy-new-large-original/string/string.h glibc-2.20-mcpy-new-large-mcpy-new/string/string.h
+--- glibc-2.20-mcpy-new-large-original/string/string.h	2015-09-02 14:28:58.383187000 -0500
++++ glibc-2.20-mcpy-new-large-mcpy-new/string/string.h	2015-09-02 14:30:49.752187000 -0500
 @@ -45,6 +45,10 @@
  /* Copy N bytes of SRC to DEST.  */
  extern void *memcpy (void *__restrict __dest, const void *__restrict __src,
@@ -41,44 +25,44 @@ diff -Naur glibc-2.20-orig/string/string.h glibc-2.20-largemcpy/string/string.h
  /* Copy N bytes of SRC to DEST, guaranteeing
     correct behavior for overlapping strings.  */
  extern void *memmove (void *__dest, const void *__src, size_t __n)
-diff -Naur glibc-2.20-orig/sysdeps/powerpc/memcpy.c glibc-2.20-largemcpy/sysdeps/powerpc/memcpy.c
---- glibc-2.20-orig/sysdeps/powerpc/memcpy.c	1969-12-31 18:00:00.000000000 -0600
-+++ glibc-2.20-largemcpy/sysdeps/powerpc/memcpy.c	2015-03-12 09:20:26.316952707 -0500
+diff -ruN glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/memcpy.c glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/memcpy.c
+--- glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/memcpy.c	1969-12-31 18:00:00.000000000 -0600
++++ glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/memcpy.c	2015-09-02 14:30:49.590187000 -0500
 @@ -0,0 +1,4 @@
 +#include <string/memcpy.c>
 +
 +weak_alias (memcpy, largememcpy)
 +libc_hidden_def (largememcpy)
-diff -Naur glibc-2.20-orig/sysdeps/powerpc/powerpc32/405/memcpy.S glibc-2.20-largemcpy/sysdeps/powerpc/powerpc32/405/memcpy.S
---- glibc-2.20-orig/sysdeps/powerpc/powerpc32/405/memcpy.S	2015-03-12 09:20:07.281952006 -0500
-+++ glibc-2.20-largemcpy/sysdeps/powerpc/powerpc32/405/memcpy.S	2015-03-12 09:20:26.317952662 -0500
+diff -ruN glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc32/405/memcpy.S glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc32/405/memcpy.S
+--- glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc32/405/memcpy.S	2015-09-02 14:28:58.206187000 -0500
++++ glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc32/405/memcpy.S	2015-09-02 14:30:49.554187000 -0500
 @@ -128,3 +128,5 @@
         blr
  END (memcpy)
  libc_hidden_builtin_def (memcpy)
 +weak_alias (memcpy,largememcpy)
 +libc_hidden_def (largememcpy)
-diff -Naur glibc-2.20-orig/sysdeps/powerpc/powerpc32/a2/memcpy.S glibc-2.20-largemcpy/sysdeps/powerpc/powerpc32/a2/memcpy.S
---- glibc-2.20-orig/sysdeps/powerpc/powerpc32/a2/memcpy.S	2015-03-12 09:20:07.294952006 -0500
-+++ glibc-2.20-largemcpy/sysdeps/powerpc/powerpc32/a2/memcpy.S	2015-03-12 09:20:26.317952662 -0500
+diff -ruN glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc32/a2/memcpy.S glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc32/a2/memcpy.S
+--- glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc32/a2/memcpy.S	2015-09-02 14:28:58.194187000 -0500
++++ glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc32/a2/memcpy.S	2015-09-02 14:30:49.541187000 -0500
 @@ -525,3 +525,5 @@
  
  END (memcpy)
  libc_hidden_builtin_def (memcpy)
 +weak_alias (memcpy, largememcpy)
 +libc_hidden_def (largememcpy)
-diff -Naur glibc-2.20-orig/sysdeps/powerpc/powerpc32/cell/memcpy.S glibc-2.20-largemcpy/sysdeps/powerpc/powerpc32/cell/memcpy.S
---- glibc-2.20-orig/sysdeps/powerpc/powerpc32/cell/memcpy.S	2015-03-12 09:20:07.289952006 -0500
-+++ glibc-2.20-largemcpy/sysdeps/powerpc/powerpc32/cell/memcpy.S	2015-03-12 09:20:26.317952662 -0500
+diff -ruN glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc32/cell/memcpy.S glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc32/cell/memcpy.S
+--- glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc32/cell/memcpy.S	2015-09-02 14:28:58.213187000 -0500
++++ glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc32/cell/memcpy.S	2015-09-02 14:30:49.561187000 -0500
 @@ -240,3 +240,5 @@
  
  END (memcpy)
  libc_hidden_builtin_def (memcpy)
 +weak_alias (memcpy, largememcpy)
 +libc_hidden_def (largememcpy)
-diff -Naur glibc-2.20-orig/sysdeps/powerpc/powerpc32/e500/memcpy.S glibc-2.20-largemcpy/sysdeps/powerpc/powerpc32/e500/memcpy.S
---- glibc-2.20-orig/sysdeps/powerpc/powerpc32/e500/memcpy.S	2015-03-12 09:20:07.297952006 -0500
-+++ glibc-2.20-largemcpy/sysdeps/powerpc/powerpc32/e500/memcpy.S	2015-03-12 09:20:26.318952619 -0500
+diff -ruN glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc32/e500/memcpy.S glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc32/e500/memcpy.S
+--- glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc32/e500/memcpy.S	2015-09-02 14:29:07.888186901 -0500
++++ glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc32/e500/memcpy.S	2015-09-02 14:30:49.539187000 -0500
 @@ -406,3 +406,8 @@
  
  END (FUNCTION)
@@ -88,10 +72,10 @@ diff -Naur glibc-2.20-orig/sysdeps/powerpc/powerpc32/e500/memcpy.S glibc-2.20-la
 +weak_alias (memcpy,largememcpy)
 +libc_hidden_def (largememcpy)
 +#endif
-diff -Naur glibc-2.20-orig/sysdeps/powerpc/powerpc32/e500mc/largememcpy.S glibc-2.20-largemcpy/sysdeps/powerpc/powerpc32/e500mc/largememcpy.S
---- glibc-2.20-orig/sysdeps/powerpc/powerpc32/e500mc/largememcpy.S	1969-12-31 18:00:00.000000000 -0600
-+++ glibc-2.20-largemcpy/sysdeps/powerpc/powerpc32/e500mc/largememcpy.S	2015-03-12 16:08:16.324952011 -0500
-@@ -0,0 +1,487 @@
+diff -ruN glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc32/e500mc/largememcpy.S glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc32/e500mc/largememcpy.S
+--- glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc32/e500mc/largememcpy.S	1969-12-31 18:00:00.000000000 -0600
++++ glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc32/e500mc/largememcpy.S	2015-09-02 14:54:00.062186965 -0500
+@@ -0,0 +1,499 @@
 +/* Optimized largememcpy implementation for e500mc 32-bit PowerPC.
 +   This version uses cache management instructions.
 +
@@ -140,10 +124,22 @@ diff -Naur glibc-2.20-orig/sysdeps/powerpc/powerpc32/e500mc/largememcpy.S glibc-
 +	neg	r0, r4
 +	andi.	r11, r0, 3
 +	beq	L(src_aligned4)
-+	lwz	r12, 0(r4)
++        /* We have to align the src pointer by r11 bytes */
++	cmplwi  cr0, r11, 1
++	ble     L(src_1)
++	/* 2 or 3 bytes */
++	addi    r8, r11, -2
++	lhz     r9, 0(r4)
++	lhzx    r12, r4, r8
++	sth     r9, 0(r6)
++	sthx    r12, r6, r8
++	b       L(src_0)
++L(src_1):
++	lbz     r8, 0(r4)
++	stb     r8, 0(r6)
++L(src_0):
 +	subf	r5, r11, r5
 +	add	r4, r4, r11
-+	stw	r12, 0(r6)
 +	add	r6, r6, r11
 +L(src_aligned4):
 +	cmplwi	7, r5, 63
@@ -579,83 +575,83 @@ diff -Naur glibc-2.20-orig/sysdeps/powerpc/powerpc32/e500mc/largememcpy.S glibc-
 +
 +END (largememcpy)
 +libc_hidden_def (largememcpy)
-diff -Naur glibc-2.20-orig/sysdeps/powerpc/powerpc32/e500mc/Makefile glibc-2.20-largemcpy/sysdeps/powerpc/powerpc32/e500mc/Makefile
---- glibc-2.20-orig/sysdeps/powerpc/powerpc32/e500mc/Makefile	1969-12-31 18:00:00.000000000 -0600
-+++ glibc-2.20-largemcpy/sysdeps/powerpc/powerpc32/e500mc/Makefile	2015-03-12 09:20:26.319952580 -0500
+diff -ruN glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc32/e500mc/Makefile glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc32/e500mc/Makefile
+--- glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc32/e500mc/Makefile	1969-12-31 18:00:00.000000000 -0600
++++ glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc32/e500mc/Makefile	2015-09-02 14:30:49.552187000 -0500
 @@ -0,0 +1,5 @@
 +#Makefile fragment for PowerPC e500mc core
 +
 +ifeq ($(subdir),string)
 +sysdep_routines += largememcpy
 +endif
-diff -Naur glibc-2.20-orig/sysdeps/powerpc/powerpc32/e5500/memcpy.S glibc-2.20-largemcpy/sysdeps/powerpc/powerpc32/e5500/memcpy.S
---- glibc-2.20-orig/sysdeps/powerpc/powerpc32/e5500/memcpy.S	2015-03-12 09:20:07.297952006 -0500
-+++ glibc-2.20-largemcpy/sysdeps/powerpc/powerpc32/e5500/memcpy.S	2015-03-12 09:20:26.319952580 -0500
-@@ -236,4 +236,6 @@
+diff -ruN glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc32/e5500/memcpy.S glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc32/e5500/memcpy.S
+--- glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc32/e5500/memcpy.S	2015-09-02 14:28:58.208187000 -0500
++++ glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc32/e5500/memcpy.S	2015-09-02 14:30:49.556187000 -0500
+@@ -249,4 +249,6 @@
  	b	L(copy_remaining)
  
  END (memcpy)
 +weak_alias (memcpy, largememcpy)
  libc_hidden_builtin_def (memcpy)
 +libc_hidden_def (largememcpy)
-diff -Naur glibc-2.20-orig/sysdeps/powerpc/powerpc32/e6500/memcpy.S glibc-2.20-largemcpy/sysdeps/powerpc/powerpc32/e6500/memcpy.S
---- glibc-2.20-orig/sysdeps/powerpc/powerpc32/e6500/memcpy.S	2015-03-12 09:20:07.289952006 -0500
-+++ glibc-2.20-largemcpy/sysdeps/powerpc/powerpc32/e6500/memcpy.S	2015-03-12 09:20:26.319952580 -0500
-@@ -185,3 +185,5 @@
+diff -ruN glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc32/e6500/memcpy.S glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc32/e6500/memcpy.S
+--- glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc32/e6500/memcpy.S	2015-09-02 14:28:58.214187000 -0500
++++ glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc32/e6500/memcpy.S	2015-09-02 14:30:49.562187000 -0500
+@@ -237,3 +237,5 @@
  
  END (memcpy)
  libc_hidden_builtin_def (memcpy)
 +weak_alias (memcpy,largememcpy)
 +libc_hidden_def (largememcpy)
-diff -Naur glibc-2.20-orig/sysdeps/powerpc/powerpc32/power4/memcpy.S glibc-2.20-largemcpy/sysdeps/powerpc/powerpc32/power4/memcpy.S
---- glibc-2.20-orig/sysdeps/powerpc/powerpc32/power4/memcpy.S	2015-03-12 09:20:07.289952006 -0500
-+++ glibc-2.20-largemcpy/sysdeps/powerpc/powerpc32/power4/memcpy.S	2015-03-12 09:20:26.319952580 -0500
+diff -ruN glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc32/power4/memcpy.S glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc32/power4/memcpy.S
+--- glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc32/power4/memcpy.S	2015-09-02 14:28:58.194187000 -0500
++++ glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc32/power4/memcpy.S	2015-09-02 14:30:49.541187000 -0500
 @@ -479,3 +479,5 @@
  END (memcpy)
  
  libc_hidden_builtin_def (memcpy)
 +weak_alias (memcpy, largememcpy)
 +libc_hidden_def (largememcpy)
-diff -Naur glibc-2.20-orig/sysdeps/powerpc/powerpc32/power6/memcpy.S glibc-2.20-largemcpy/sysdeps/powerpc/powerpc32/power6/memcpy.S
---- glibc-2.20-orig/sysdeps/powerpc/powerpc32/power6/memcpy.S	2015-03-12 09:20:07.294952006 -0500
-+++ glibc-2.20-largemcpy/sysdeps/powerpc/powerpc32/power6/memcpy.S	2015-03-12 09:20:26.320952543 -0500
+diff -ruN glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc32/power6/memcpy.S glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc32/power6/memcpy.S
+--- glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc32/power6/memcpy.S	2015-09-02 14:28:58.211187000 -0500
++++ glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc32/power6/memcpy.S	2015-09-02 14:30:49.559187000 -0500
 @@ -905,3 +905,5 @@
  END (memcpy)
  
  libc_hidden_builtin_def (memcpy)
 +weak_alias (memcpy, largememcpy)
 +libc_hidden_def (largememcpy)
-diff -Naur glibc-2.20-orig/sysdeps/powerpc/powerpc32/power7/memcpy.S glibc-2.20-largemcpy/sysdeps/powerpc/powerpc32/power7/memcpy.S
---- glibc-2.20-orig/sysdeps/powerpc/powerpc32/power7/memcpy.S	2015-03-12 09:20:07.291952006 -0500
-+++ glibc-2.20-largemcpy/sysdeps/powerpc/powerpc32/power7/memcpy.S	2015-03-12 09:20:26.320952543 -0500
+diff -ruN glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc32/power7/memcpy.S glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc32/power7/memcpy.S
+--- glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc32/power7/memcpy.S	2015-09-02 14:28:58.207187000 -0500
++++ glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc32/power7/memcpy.S	2015-09-02 14:30:49.555187000 -0500
 @@ -536,3 +536,5 @@
  
  END (memcpy)
  libc_hidden_builtin_def (memcpy)
 +weak_alias (memcpy, largememcpy)
 +libc_hidden_def (largememcpy)
-diff -Naur glibc-2.20-orig/sysdeps/powerpc/powerpc64/a2/memcpy.S glibc-2.20-largemcpy/sysdeps/powerpc/powerpc64/a2/memcpy.S
---- glibc-2.20-orig/sysdeps/powerpc/powerpc64/a2/memcpy.S	2015-03-12 09:20:07.278952006 -0500
-+++ glibc-2.20-largemcpy/sysdeps/powerpc/powerpc64/a2/memcpy.S	2015-03-12 09:20:26.321952508 -0500
+diff -ruN glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc64/a2/memcpy.S glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc64/a2/memcpy.S
+--- glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc64/a2/memcpy.S	2015-09-02 14:28:58.219187000 -0500
++++ glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc64/a2/memcpy.S	2015-09-02 14:30:49.567187000 -0500
 @@ -522,3 +522,5 @@
  
  END_GEN_TB (memcpy,TB_TOCLESS)
  libc_hidden_builtin_def (memcpy)
 +weak_alias (memcpy, largememcpy)
 +libc_hidden_def (largememcpy)
-diff -Naur glibc-2.20-orig/sysdeps/powerpc/powerpc64/cell/memcpy.S glibc-2.20-largemcpy/sysdeps/powerpc/powerpc64/cell/memcpy.S
---- glibc-2.20-orig/sysdeps/powerpc/powerpc64/cell/memcpy.S	2015-03-12 09:20:07.265952006 -0500
-+++ glibc-2.20-largemcpy/sysdeps/powerpc/powerpc64/cell/memcpy.S	2015-03-12 09:20:26.321952508 -0500
+diff -ruN glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc64/cell/memcpy.S glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc64/cell/memcpy.S
+--- glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc64/cell/memcpy.S	2015-09-02 14:28:58.239187000 -0500
++++ glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc64/cell/memcpy.S	2015-09-02 14:30:49.588187000 -0500
 @@ -240,3 +240,5 @@
  
  END_GEN_TB (memcpy,TB_TOCLESS)
  libc_hidden_builtin_def (memcpy)
 +weak_alias (memcpy, largememcpy)
 +libc_hidden_def (largememcpy)
-diff -Naur glibc-2.20-orig/sysdeps/powerpc/powerpc64/e5500/largememcpy.S glibc-2.20-largemcpy/sysdeps/powerpc/powerpc64/e5500/largememcpy.S
---- glibc-2.20-orig/sysdeps/powerpc/powerpc64/e5500/largememcpy.S	1969-12-31 18:00:00.000000000 -0600
-+++ glibc-2.20-largemcpy/sysdeps/powerpc/powerpc64/e5500/largememcpy.S	2015-03-12 16:04:32.547952039 -0500
-@@ -0,0 +1,200 @@
+diff -ruN glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc64/e5500/largememcpy.S glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc64/e5500/largememcpy.S
+--- glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc64/e5500/largememcpy.S	1969-12-31 18:00:00.000000000 -0600
++++ glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc64/e5500/largememcpy.S	2015-09-02 14:56:08.056186467 -0500
+@@ -0,0 +1,221 @@
 +/* Optimized largememcpy implementation for e5500 64-bit PowerPC64.
 +   This version uses cache management instructions.
 +
@@ -710,10 +706,31 @@ diff -Naur glibc-2.20-orig/sysdeps/powerpc/powerpc64/e5500/largememcpy.S glibc-2
 +	neg	r0, r4
 +	andi.	r11, r0, 7
 +	beq	L(src_aligned)
-+	ld	r12, 0(r4)
++	/* We have to align the src pointer by r11 bytes */
++	cmplwi	cr1, r11, 4
++	cmplwi	cr0, r11, 1
++	bgt	cr1, L(src_567)
++	ble	cr0, L(src_1)
++	/* 2, 3 or 4 bytes */
++	addi	r0, r11, -2
++	lhz	r9, 0(r4)
++	lhzx	r12, r4, r0
++	sth	r9, 0(r6)
++	sthx	r12, r6, r0
++	b	L(src_0)
++L(src_567):
++	addi	r0, r11, -4
++	lwz	r9, 0(r4)
++	lwzx	r12, r4, r0
++	stw	r9, 0(r6)
++	stwx	r12, r6, r0
++	b	L(src_0)
++L(src_1):
++	lbz	r0, 0(r4)
++	stb	r0, 0(r6)
++L(src_0):
 +	subf	r5, r11, r5
 +	add	r4, r4, r11
-+	std	r12, 0(r6)
 +	add	r6, r6, r11
 +L(src_aligned):
 +	cmpldi	7, r5, 63
@@ -856,55 +873,55 @@ diff -Naur glibc-2.20-orig/sysdeps/powerpc/powerpc64/e5500/largememcpy.S glibc-2
 +
 +END_GEN_TB (largememcpy,TB_TOCLESS)
 +libc_hidden_def (largememcpy)
-diff -Naur glibc-2.20-orig/sysdeps/powerpc/powerpc64/e5500/Makefile glibc-2.20-largemcpy/sysdeps/powerpc/powerpc64/e5500/Makefile
---- glibc-2.20-orig/sysdeps/powerpc/powerpc64/e5500/Makefile	1969-12-31 18:00:00.000000000 -0600
-+++ glibc-2.20-largemcpy/sysdeps/powerpc/powerpc64/e5500/Makefile	2015-03-12 09:20:26.322952475 -0500
+diff -ruN glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc64/e5500/Makefile glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc64/e5500/Makefile
+--- glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc64/e5500/Makefile	1969-12-31 18:00:00.000000000 -0600
++++ glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc64/e5500/Makefile	2015-09-02 14:30:49.572187000 -0500
 @@ -0,0 +1,5 @@
 +#Makefile fragment for PowerPC e5500 64-bit core
 +
 +ifeq ($(subdir),string)
 +sysdep_routines += largememcpy
 +endif
-diff -Naur glibc-2.20-orig/sysdeps/powerpc/powerpc64/e6500/memcpy.S glibc-2.20-largemcpy/sysdeps/powerpc/powerpc64/e6500/memcpy.S
---- glibc-2.20-orig/sysdeps/powerpc/powerpc64/e6500/memcpy.S	2015-03-12 09:20:07.266952006 -0500
-+++ glibc-2.20-largemcpy/sysdeps/powerpc/powerpc64/e6500/memcpy.S	2015-03-12 09:20:26.322952475 -0500
-@@ -181,4 +181,6 @@
+diff -ruN glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc64/e6500/memcpy.S glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc64/e6500/memcpy.S
+--- glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc64/e6500/memcpy.S	2015-09-02 14:28:58.240187000 -0500
++++ glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc64/e6500/memcpy.S	2015-09-02 14:30:49.589187000 -0500
+@@ -210,4 +210,6 @@
  	b	L(copy_remaining)
  
  END_GEN_TB (memcpy,TB_TOCLESS)
 +weak_alias (memcpy,largememcpy)
  libc_hidden_builtin_def (memcpy)
 +libc_hidden_def (largememcpy)
-diff -Naur glibc-2.20-orig/sysdeps/powerpc/powerpc64/power4/memcpy.S glibc-2.20-largemcpy/sysdeps/powerpc/powerpc64/power4/memcpy.S
---- glibc-2.20-orig/sysdeps/powerpc/powerpc64/power4/memcpy.S	2015-03-12 09:20:07.265952006 -0500
-+++ glibc-2.20-largemcpy/sysdeps/powerpc/powerpc64/power4/memcpy.S	2015-03-12 09:20:26.322952475 -0500
+diff -ruN glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc64/power4/memcpy.S glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc64/power4/memcpy.S
+--- glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc64/power4/memcpy.S	2015-09-02 14:28:58.219187000 -0500
++++ glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc64/power4/memcpy.S	2015-09-02 14:30:49.567187000 -0500
 @@ -472,3 +472,5 @@
      blr
  END_GEN_TB (memcpy,TB_TOCLESS)
  libc_hidden_builtin_def (memcpy)
 +weak_alias (memcpy,largememcpy)
 +libc_hidden_def (largememcpy)
-diff -Naur glibc-2.20-orig/sysdeps/powerpc/powerpc64/power6/memcpy.S glibc-2.20-largemcpy/sysdeps/powerpc/powerpc64/power6/memcpy.S
---- glibc-2.20-orig/sysdeps/powerpc/powerpc64/power6/memcpy.S	2015-03-12 09:20:07.279952006 -0500
-+++ glibc-2.20-largemcpy/sysdeps/powerpc/powerpc64/power6/memcpy.S	2015-03-12 09:20:26.323952444 -0500
+diff -ruN glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc64/power6/memcpy.S glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc64/power6/memcpy.S
+--- glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc64/power6/memcpy.S	2015-09-02 14:28:58.238187000 -0500
++++ glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc64/power6/memcpy.S	2015-09-02 14:30:49.586187000 -0500
 @@ -1494,3 +1494,5 @@
      blr
  END_GEN_TB (memcpy,TB_TOCLESS)
  libc_hidden_builtin_def (memcpy)
 +weak_alias (memcpy,largememcpy)
 +libc_hidden_def (largememcpy)
-diff -Naur glibc-2.20-orig/sysdeps/powerpc/powerpc64/power7/memcpy.S glibc-2.20-largemcpy/sysdeps/powerpc/powerpc64/power7/memcpy.S
---- glibc-2.20-orig/sysdeps/powerpc/powerpc64/power7/memcpy.S	2015-03-12 09:20:07.268952006 -0500
-+++ glibc-2.20-largemcpy/sysdeps/powerpc/powerpc64/power7/memcpy.S	2015-03-12 09:20:26.323952444 -0500
+diff -ruN glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc64/power7/memcpy.S glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc64/power7/memcpy.S
+--- glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/powerpc64/power7/memcpy.S	2015-09-02 14:28:58.222187000 -0500
++++ glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/powerpc64/power7/memcpy.S	2015-09-02 14:30:49.570187000 -0500
 @@ -424,3 +424,5 @@
  
  END_GEN_TB (memcpy,TB_TOCLESS)
  libc_hidden_builtin_def (memcpy)
 +weak_alias (memcpy,largememcpy)
 +libc_hidden_def (largememcpy)
-diff -Naur glibc-2.20-orig/sysdeps/powerpc/Versions glibc-2.20-largemcpy/sysdeps/powerpc/Versions
---- glibc-2.20-orig/sysdeps/powerpc/Versions	2015-03-12 09:20:07.301952006 -0500
-+++ glibc-2.20-largemcpy/sysdeps/powerpc/Versions	2015-03-12 09:20:26.323952444 -0500
+diff -ruN glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/Versions glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/Versions
+--- glibc-2.20-mcpy-new-large-original/sysdeps/powerpc/Versions	2015-09-02 14:28:58.244187000 -0500
++++ glibc-2.20-mcpy-new-large-mcpy-new/sysdeps/powerpc/Versions	2015-09-02 14:30:49.593187000 -0500
 @@ -9,6 +9,7 @@
    GLIBC_2.3.4 {
      _longjmp; __sigsetjmp; _setjmp;

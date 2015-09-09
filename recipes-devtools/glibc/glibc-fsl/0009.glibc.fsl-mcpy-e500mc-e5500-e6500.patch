@@ -1,17 +1,12 @@
-# Problem Statement:
-  Implement target specific optimized memcpy for e500mc,
-  32-bit e5500/e6500, 64-bit e5500/6500
-
-# Owned by:
-  Rohit [based on 'C' implementation by Ruchika Gupta & Vakul Garg]
-
-# Actions:
-  * Add optimized memcpy library functions for e500mc/e5500/e6500 targets.
-
-diff -Naur glibc-2.20/sysdeps/powerpc/powerpc32/e500mc/memcpy.S glibc-2.20-mcpy/sysdeps/powerpc/powerpc32/e500mc/memcpy.S
---- glibc-2.20/sysdeps/powerpc/powerpc32/e500mc/memcpy.S	1969-12-31 18:00:00.000000000 -0600
-+++ glibc-2.20-mcpy/sysdeps/powerpc/powerpc32/e500mc/memcpy.S	2015-07-08 04:05:44.598952006 -0500
-@@ -0,0 +1,266 @@
+diff -ruN glibc-2.20-original/sysdeps/powerpc/powerpc32/e500mc/memcopy.h glibc-2.20-mcpy-new/sysdeps/powerpc/powerpc32/e500mc/memcopy.h
+--- glibc-2.20-original/sysdeps/powerpc/powerpc32/e500mc/memcopy.h	1969-12-31 18:00:00.000000000 -0600
++++ glibc-2.20-mcpy-new/sysdeps/powerpc/powerpc32/e500mc/memcopy.h	2015-09-02 10:25:24.685186994 -0500
+@@ -0,0 +1 @@
++#include "../../powerpc32/power4/memcopy.h"
+diff -ruN glibc-2.20-original/sysdeps/powerpc/powerpc32/e500mc/memcpy.S glibc-2.20-mcpy-new/sysdeps/powerpc/powerpc32/e500mc/memcpy.S
+--- glibc-2.20-original/sysdeps/powerpc/powerpc32/e500mc/memcpy.S	1969-12-31 18:00:00.000000000 -0600
++++ glibc-2.20-mcpy-new/sysdeps/powerpc/powerpc32/e500mc/memcpy.S	2015-09-02 13:02:28.158186930 -0500
+@@ -0,0 +1,285 @@
 +/* Optimized memcpy implementation for e500mc PowerPC.
 +   Copyright (C) 2015 Free Software Foundation, Inc.
 +   This file is part of the GNU C Library.
@@ -57,12 +52,31 @@ diff -Naur glibc-2.20/sysdeps/powerpc/powerpc32/e500mc/memcpy.S glibc-2.20-mcpy/
 +	neg	r0, r4
 +	andi.	r11, r0, 7
 +	beq	L(src_aligned)
-+	lwz	r0, 0(r4)
-+	lwz	r12, 4(r4)
++	/* We have to align the src pointer by r11 bytes */
++	cmplwi	cr1, r11, 4
++	cmplwi	cr0, r11, 1
++	bgt	cr1, L(src_567)
++	ble	cr0, L(src_1)
++	/* 2, 3 or 4 bytes */
++	addi	r0, r11, -2
++	lhz	r9, 0(r4)
++	lhzx	r12, r4, r0
++	sth	r9, 0(r6)
++	sthx	r12, r6, r0
++	b	L(src_0)
++L(src_567):
++	addi	r0, r11, -4
++	lwz	r9, 0(r4)
++	lwzx	r12, r4, r0
++	stw	r9, 0(r6)
++	stwx	r12, r6, r0
++	b	L(src_0)
++L(src_1):
++	lbz	r0, 0(r4)
++	stb	r0, 0(r6)
++L(src_0):
 +	subf	r5, r11, r5
 +	add	r4, r4, r11
-+	stw	r0, 0(r6)
-+	stw	r12, 4(r6)
 +	add	r6, r6, r11
 +L(src_aligned):
 +	cmplwi	7, r5, 63
@@ -278,10 +292,15 @@ diff -Naur glibc-2.20/sysdeps/powerpc/powerpc32/e500mc/memcpy.S glibc-2.20-mcpy/
 +
 +END (memcpy)
 +libc_hidden_builtin_def (memcpy)
-diff -Naur glibc-2.20/sysdeps/powerpc/powerpc32/e5500/memcpy.S glibc-2.20-mcpy/sysdeps/powerpc/powerpc32/e5500/memcpy.S
---- glibc-2.20/sysdeps/powerpc/powerpc32/e5500/memcpy.S	1969-12-31 18:00:00.000000000 -0600
-+++ glibc-2.20-mcpy/sysdeps/powerpc/powerpc32/e5500/memcpy.S	2015-07-08 04:05:44.598952006 -0500
-@@ -0,0 +1,239 @@
+diff -ruN glibc-2.20-original/sysdeps/powerpc/powerpc32/e5500/memcopy.h glibc-2.20-mcpy-new/sysdeps/powerpc/powerpc32/e5500/memcopy.h
+--- glibc-2.20-original/sysdeps/powerpc/powerpc32/e5500/memcopy.h	1969-12-31 18:00:00.000000000 -0600
++++ glibc-2.20-mcpy-new/sysdeps/powerpc/powerpc32/e5500/memcopy.h	2015-09-02 10:25:24.687187004 -0500
+@@ -0,0 +1 @@
++#include "../../powerpc32/power4/memcopy.h"
+diff -ruN glibc-2.20-original/sysdeps/powerpc/powerpc32/e5500/memcpy.S glibc-2.20-mcpy-new/sysdeps/powerpc/powerpc32/e5500/memcpy.S
+--- glibc-2.20-original/sysdeps/powerpc/powerpc32/e5500/memcpy.S	1969-12-31 18:00:00.000000000 -0600
++++ glibc-2.20-mcpy-new/sysdeps/powerpc/powerpc32/e5500/memcpy.S	2015-09-02 13:28:07.737187170 -0500
+@@ -0,0 +1,252 @@
 +/* Optimized memcpy implementation for e5500 32-bit PowerPC.
 +   Copyright (C) 2015 Free Software Foundation, Inc.
 +   This file is part of the GNU C Library.
@@ -327,12 +346,25 @@ diff -Naur glibc-2.20/sysdeps/powerpc/powerpc32/e5500/memcpy.S glibc-2.20-mcpy/s
 +	neg	r0, r4
 +	andi.	r11, r0, 3
 +	beq	L(src_align4)
-+	lwz	r12, 0(r4)
++	/* We have to align the src pointer by r11 bytes */
++	cmplwi	cr0, r11, 1
++	ble	L(src_1)
++	/* 2 or 3 bytes */
++	addi	r8, r11, -2
++	lhz	r9, 0(r4)
++	lhzx	r12, r4, r8
++	sth	r9, 0(r6)
++	sthx	r12, r6, r8
++	b	L(src_0)
++L(src_1):
++	lbz	r8, 0(r4)
++	stb	r8, 0(r6)
++L(src_0):
 +	subf	r5, r11, r5
 +	add	r4, r4, r11
-+	stw	r12, 0(r6)
 +	add	r6, r6, r11
 +L(src_align4):
++	/* Aligned by 4, now extend it to 16 */
 +	cmplwi	7, r5, 63
 +	ble	7, L(copy_remaining)
 +	andi.	r10, r0, 15
@@ -521,10 +553,15 @@ diff -Naur glibc-2.20/sysdeps/powerpc/powerpc32/e5500/memcpy.S glibc-2.20-mcpy/s
 +
 +END (memcpy)
 +libc_hidden_builtin_def (memcpy)
-diff -Naur glibc-2.20/sysdeps/powerpc/powerpc32/e6500/memcpy.S glibc-2.20-mcpy/sysdeps/powerpc/powerpc32/e6500/memcpy.S
---- glibc-2.20/sysdeps/powerpc/powerpc32/e6500/memcpy.S	1969-12-31 18:00:00.000000000 -0600
-+++ glibc-2.20-mcpy/sysdeps/powerpc/powerpc32/e6500/memcpy.S	2015-07-08 04:19:10.032952006 -0500
-@@ -0,0 +1,212 @@
+diff -ruN glibc-2.20-original/sysdeps/powerpc/powerpc32/e6500/memcopy.h glibc-2.20-mcpy-new/sysdeps/powerpc/powerpc32/e6500/memcopy.h
+--- glibc-2.20-original/sysdeps/powerpc/powerpc32/e6500/memcopy.h	1969-12-31 18:00:00.000000000 -0600
++++ glibc-2.20-mcpy-new/sysdeps/powerpc/powerpc32/e6500/memcopy.h	2015-09-02 10:25:24.688187005 -0500
+@@ -0,0 +1 @@
++#include "../../powerpc32/power4/memcopy.h"
+diff -ruN glibc-2.20-original/sysdeps/powerpc/powerpc32/e6500/memcpy.S glibc-2.20-mcpy-new/sysdeps/powerpc/powerpc32/e6500/memcpy.S
+--- glibc-2.20-original/sysdeps/powerpc/powerpc32/e6500/memcpy.S	1969-12-31 18:00:00.000000000 -0600
++++ glibc-2.20-mcpy-new/sysdeps/powerpc/powerpc32/e6500/memcpy.S	2015-09-03 10:36:14.741186863 -0500
+@@ -0,0 +1,241 @@
 +/* Optimized memcpy implementation for e6500 32-bit PowerPC.
 +   Copyright (C) 2015 Free Software Foundation, Inc.
 +   This file is part of the GNU C Library.
@@ -570,16 +607,45 @@ diff -Naur glibc-2.20/sysdeps/powerpc/powerpc32/e6500/memcpy.S glibc-2.20-mcpy/s
 +	neg	r0, r3
 +	andi.	r11, r0, 15
 +	beq	L(dst_align16)
-+	lwz	r0, 0(r4)
-+	lwz	r7, 4(r4)
-+	lwz	r8, 8(r4)
-+	lwz	r9, 12(r4)
++	/* We have to align the src pointer by r11 bytes */
++	cmplwi	cr2, r11, 8
++	blt	cr2, L(src_1_7)
++	/* Take care of 8 bytes at once */
++	lwz	r9, 0(r4)
++	lwz	r12, 4(r4)
++	addi	r11, r11, -8
++	addi	r5, r5, -8
++	stw	r9, 0(r6)
++	stw	r12, 4(r6)
++	cmplwi	cr0, r11, 0
++	addi	r4, r4, 8
++	addi	r6, r6, 8
++	beq	cr0, L(dst_align16)
++L(src_1_7):
++	cmplwi	cr1, r11, 4
++	cmplwi	cr0, r11, 1
++	bgt	cr1, L(src_567)
++	ble	cr0, L(src_1)
++	/* 2, 3 or 4 bytes */
++	addi	r0, r11, -2
++	lhz	r9, 0(r4)
++	lhzx	r12, r4, r0
++	sth	r9, 0(r6)
++	sthx	r12, r6, r0
++	b	L(src_0)
++L(src_567):
++	addi	r0, r11, -4
++	lwz	r9, 0(r4)
++	lwzx	r12, r4, r0
++	stw	r9, 0(r6)
++	stwx	r12, r6, r0
++	b	L(src_0)
++L(src_1):
++	lbz	r0, 0(r4)
++	stb	r0, 0(r6)
++L(src_0):
 +	subf	r5, r11, r5
 +	add	r4, r4, r11
-+	stw	r0, 0(r6)
-+	stw	r7, 4(r6)
-+	stw	r8, 8(r6)
-+	stw	r9, 12(r6)
 +	add	r6, r6, r11
 +L(dst_align16):
 +	cmplwi	7, r5, 63
@@ -737,10 +803,15 @@ diff -Naur glibc-2.20/sysdeps/powerpc/powerpc32/e6500/memcpy.S glibc-2.20-mcpy/s
 +
 +END (memcpy)
 +libc_hidden_builtin_def (memcpy)
-diff -Naur glibc-2.20/sysdeps/powerpc/powerpc64/e5500/memcpy.S glibc-2.20-mcpy/sysdeps/powerpc/powerpc64/e5500/memcpy.S
---- glibc-2.20/sysdeps/powerpc/powerpc64/e5500/memcpy.S	1969-12-31 18:00:00.000000000 -0600
-+++ glibc-2.20-mcpy/sysdeps/powerpc/powerpc64/e5500/memcpy.S	2015-07-08 04:05:44.599952006 -0500
-@@ -0,0 +1,134 @@
+diff -ruN glibc-2.20-original/sysdeps/powerpc/powerpc64/e5500/memcopy.h glibc-2.20-mcpy-new/sysdeps/powerpc/powerpc64/e5500/memcopy.h
+--- glibc-2.20-original/sysdeps/powerpc/powerpc64/e5500/memcopy.h	1969-12-31 18:00:00.000000000 -0600
++++ glibc-2.20-mcpy-new/sysdeps/powerpc/powerpc64/e5500/memcopy.h	2015-09-02 10:25:24.690187004 -0500
+@@ -0,0 +1 @@
++#include "../../powerpc32/power4/memcopy.h"
+diff -ruN glibc-2.20-original/sysdeps/powerpc/powerpc64/e5500/memcpy.S glibc-2.20-mcpy-new/sysdeps/powerpc/powerpc64/e5500/memcpy.S
+--- glibc-2.20-original/sysdeps/powerpc/powerpc64/e5500/memcpy.S	1969-12-31 18:00:00.000000000 -0600
++++ glibc-2.20-mcpy-new/sysdeps/powerpc/powerpc64/e5500/memcpy.S	2015-09-02 13:36:52.006187230 -0500
+@@ -0,0 +1,155 @@
 +/* Optimized memcpy implementation for e5500 64-bit PowerPC.
 +   Copyright (C) 2015 Free Software Foundation, Inc.
 +   This file is part of the GNU C Library.
@@ -787,10 +858,31 @@ diff -Naur glibc-2.20/sysdeps/powerpc/powerpc64/e5500/memcpy.S glibc-2.20-mcpy/s
 +	neg	r0, r4
 +	andi.	r11, r0, 7
 +	beq	L(src_aligned)
-+	ld	r12, 0(r4)
++	/* We have to align the src pointer by r11 bytes */
++	cmplwi	cr1, r11, 4
++	cmplwi	cr0, r11, 1
++	bgt	cr1, L(src_567)
++	ble	cr0, L(src_1)
++	/* 2, 3 or 4 bytes */
++	addi	r0, r11, -2
++	lhz	r9, 0(r4)
++	lhzx	r12, r4, r0
++	sth	r9, 0(r6)
++	sthx	r12, r6, r0
++	b	L(src_0)
++L(src_567):
++	addi	r0, r11, -4
++	lwz	r9, 0(r4)
++	lwzx	r12, r4, r0
++	stw	r9, 0(r6)
++	stwx	r12, r6, r0
++	b	L(src_0)
++L(src_1):
++	lbz	r0, 0(r4)
++	stb	r0, 0(r6)
++L(src_0):
 +	subf	r5, r11, r5
 +	add	r4, r4, r11
-+	std	r12, 0(r6)
 +	add	r6, r6, r11
 +L(src_aligned):
 +	cmpldi	7, r5, 63
@@ -875,10 +967,15 @@ diff -Naur glibc-2.20/sysdeps/powerpc/powerpc64/e5500/memcpy.S glibc-2.20-mcpy/s
 +
 +END_GEN_TB (memcpy,TB_TOCLESS)
 +libc_hidden_builtin_def (memcpy)
-diff -Naur glibc-2.20/sysdeps/powerpc/powerpc64/e6500/memcpy.S glibc-2.20-mcpy/sysdeps/powerpc/powerpc64/e6500/memcpy.S
---- glibc-2.20/sysdeps/powerpc/powerpc64/e6500/memcpy.S	1969-12-31 18:00:00.000000000 -0600
-+++ glibc-2.20-mcpy/sysdeps/powerpc/powerpc64/e6500/memcpy.S	2015-07-08 04:05:44.599952006 -0500
-@@ -0,0 +1,184 @@
+diff -ruN glibc-2.20-original/sysdeps/powerpc/powerpc64/e6500/memcopy.h glibc-2.20-mcpy-new/sysdeps/powerpc/powerpc64/e6500/memcopy.h
+--- glibc-2.20-original/sysdeps/powerpc/powerpc64/e6500/memcopy.h	1969-12-31 18:00:00.000000000 -0600
++++ glibc-2.20-mcpy-new/sysdeps/powerpc/powerpc64/e6500/memcopy.h	2015-09-02 10:25:24.691187001 -0500
+@@ -0,0 +1 @@
++#include "../../powerpc32/power4/memcopy.h"
+diff -ruN glibc-2.20-original/sysdeps/powerpc/powerpc64/e6500/memcpy.S glibc-2.20-mcpy-new/sysdeps/powerpc/powerpc64/e6500/memcpy.S
+--- glibc-2.20-original/sysdeps/powerpc/powerpc64/e6500/memcpy.S	1969-12-31 18:00:00.000000000 -0600
++++ glibc-2.20-mcpy-new/sysdeps/powerpc/powerpc64/e6500/memcpy.S	2015-09-03 10:37:02.937187202 -0500
+@@ -0,0 +1,215 @@
 +/* Optimized memcpy implementation for e6500 64-bit PowerPC.
 +   Copyright (C) 2015 Free Software Foundation, Inc.
 +   This file is part of the GNU C Library.
@@ -925,12 +1022,43 @@ diff -Naur glibc-2.20/sysdeps/powerpc/powerpc64/e6500/memcpy.S glibc-2.20-mcpy/s
 +	neg	r0, r3
 +	andi.	r11, r0, 15
 +	beq	L(dst_align)
-+	ld	r12, 0(r4)
-+	ld	r0, 8(r4)
++ 	/* We have to align the src pointer by r11 bytes */
++	cmplwi	cr2, r11, 8
++	blt	cr2, L(src_1_7)
++	/* Take care of 8 bytes at once */
++	ld	r9, 0(r4)
++	addi	r11, r11, -8
++	addi	r5, r5, -8
++	std	r9, 0(r6)
++	cmplwi	cr0, r11, 0
++	addi	r4, r4, 8
++	addi	r6, r6, 8
++	beq	cr0, L(dst_align)
++L(src_1_7):
++	cmplwi	cr1, r11, 4
++	cmplwi	cr0, r11, 1
++	bgt	cr1, L(src_567)
++	ble	cr0, L(src_1)
++	/* 2, 3 or 4 bytes */
++	addi	r0, r11, -2
++	lhz	r9, 0(r4)
++	lhzx	r12, r4, r0
++	sth	r9, 0(r6)
++	sthx	r12, r6, r0
++	b	L(src_0)
++L(src_567):
++	addi	r0, r11, -4
++	lwz	r9, 0(r4)
++	lwzx	r12, r4, r0
++	stw	r9, 0(r6)
++	stwx	r12, r6, r0
++	b	L(src_0)
++L(src_1):
++	lbz	r0, 0(r4)
++	stb	r0, 0(r6)
++L(src_0):
 +	subf	r5, r11, r5
 +	add	r4, r4, r11
-+	std	r12, 0(r6)
-+	std	r0, 8(r6)
 +	add	r6, r6, r11
 +L(dst_align):
 +	cmpldi	7, r5, 63
