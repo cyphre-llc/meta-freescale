@@ -69,7 +69,6 @@ FSLPATCHES = "\
     file://0020.glibc.fsl-largemcpy-e500mc-e5500-e6500.patch \
     file://0021.glibc.undefined_static.patch \
     file://0022.glibc.use-option-groups.patch \
-    file://0023.glibc.ppc-e500-strcmp.patch \
 "
 
 LIC_FILES_CHKSUM = "file://LICENSES;md5=e9a558e243b36d3209f380deb394b213 \

@@ -2523,3 +2523,20 @@ diff -Naur libc/sysdeps/powerpc/powerpc32/e500/strlen.S libc-e500v2-lib/sysdeps/
 +
 +END (strlen)
 +libc_hidden_builtin_def (strlen)
+diff -Naur glibc-2.20/sysdeps/powerpc/powerpc32/e500/strcmp.S glibc-2.20-stcmp/sysdeps/powerpc/powerpc32/e500/strcmp.S
+--- glibc-2.20/sysdeps/powerpc/powerpc32/e500/strcmp.S	2015-08-27 04:27:44.436000785 -0500
++++ glibc-2.20-stcmp/sysdeps/powerpc/powerpc32/e500/strcmp.S	2015-08-27 04:33:45.417000790 -0500
+@@ -618,7 +618,7 @@
+         evandc r9,r11,r7
+         evand r9,r3,r9
+         evcmpgtu 5,r9,r0
+-        bt 22,L(found_early_null)
++        bt 21,L(found_early_null)
+ 
+         /* Now load the next 2 words of r4, and realign the
+ 	 * data to r10.  Then branch out if any of the bytes
+diff -ruN glibc-2.20-orig/sysdeps/powerpc/powerpc32/e500/memcopy.h glibc-2.20-new/sysdeps/powerpc/powerpc32/e500/memcopy.h
+--- glibc-2.20-orig/sysdeps/powerpc/powerpc32/e500/memcopy.h	1969-12-31 18:00:00.000000000 -0600
++++ glibc-2.20-new/sysdeps/powerpc/powerpc32/e500/memcopy.h	2015-09-10 11:06:13.243187000 -0500
+@@ -0,0 +1 @@
++#include "../../powerpc32/power4/memcopy.h"
