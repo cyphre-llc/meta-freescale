@@ -203,6 +203,7 @@ LAYER_LIST=" \
     meta-browser \
     meta-virtualization \
     meta-linaro/meta-linaro-toolchain \
+    meta-fsl-local-build \
 "
 
 EULA_FILE="$FSLROOTDIR/EULA"
