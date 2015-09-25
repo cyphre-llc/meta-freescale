@@ -16,6 +16,7 @@ RDEPENDS_${PN}-core = "\
     iperf \
     iozone3 \
     lmbench \
+    netperf \
 "
 
 RDEPENDS_${PN}-extended = " \
