@@ -204,6 +204,7 @@ LAYER_LIST=" \
     meta-virtualization \
     meta-linaro/meta-linaro-toolchain \
     meta-fsl-local-build \
+    meta-fsl-testing \
 "
 
 EULA_FILE="$FSLROOTDIR/EULA"
