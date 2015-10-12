@@ -202,6 +202,7 @@ LAYER_LIST=" \
     meta-fsl-demos \
     meta-browser \
     meta-virtualization \
+    meta-java \
     meta-linaro/meta-linaro-toolchain \
     meta-fsl-local-build \
     meta-fsl-testing \
