@@ -188,7 +188,9 @@ LAYER_LIST=" \
     meta-openembedded/meta-multimedia \
     meta-openembedded/meta-gnome \
     meta-openembedded/meta-networking \
+    meta-openembedded/meta-perl \
     meta-openembedded/meta-python \
+    meta-openembedded/meta-ruby \
     meta-openembedded/meta-filesystems \
     meta-openembedded/meta-webserver \
     meta-openembedded/toolchain-layer \
@@ -204,6 +206,16 @@ LAYER_LIST=" \
     meta-virtualization \
     meta-java \
     meta-linaro/meta-linaro-toolchain \
+    meta-cloud-services/meta-openstack \
+    meta-cloud-services/meta-openstack-aio-deploy \
+    meta-cloud-services/meta-openstack-compute-deploy \
+    meta-cloud-services/meta-openstack-compute-test-config \
+    meta-cloud-services/meta-openstack-controller-deploy \
+    meta-cloud-services/meta-openstack-controller-test-config \
+    meta-cloud-services/meta-openstack-qemu \
+    meta-cloud-services/meta-openstack-swift-deploy \
+    meta-cloud-services \
+    meta-security \
     meta-fsl-local-build \
     meta-fsl-testing \
 "
