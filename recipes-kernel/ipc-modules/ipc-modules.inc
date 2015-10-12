@@ -14,12 +14,12 @@ do_configure_prepend() {
     sed -i 's,$(KERNEL_DIR)/.config,$(KBUILD_OUTPUT)/.config,' ${S}/kernel/Makefile
 }
 
+SOC ?= "B4860"
+SOC_bsc9131 = "B913x"
+SOC_bsc9132 = "B913x"
+
 do_compile_prepend () {
     cd ${S}/kernel
-    case ${MACHINE} in
-        bsc9132qds|bsc9131rdb) SOC=B913x;;
-        b4860qds|b4420qds) SOC=B4860;;
-    esac
 }
 
 INHIBIT_PACKAGE_STRIP = "1"
