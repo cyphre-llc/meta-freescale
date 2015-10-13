@@ -14,4 +14,5 @@ IMAGE_INSTALL_append = " \
     packagegroup-fsl-mfgtools \
 "
 
+IMAGE_FSTYPES_append_qoriq = " ubi jffs2"
 export IMAGE_BASENAME = "fsl-image-mfgtool"
