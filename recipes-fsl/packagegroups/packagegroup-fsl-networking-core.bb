@@ -30,6 +30,7 @@ RDEPENDS_${PN} = " \
     inetutils-tftp \
     inetutils-traceroute \
     ipsec-tools \
+    ipsec-demo \
     net-tools \
     tcpdump \
 "
