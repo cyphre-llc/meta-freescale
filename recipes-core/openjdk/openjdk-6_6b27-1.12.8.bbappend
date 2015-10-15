@@ -1,4 +1,4 @@
-FILESPATH_prepend := "${THISDIR}/openjdk-6-6b27:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/openjdk-6-6b27:"
 
 ICEDTEAPATCHES += "file://icedtea-openjdk-remove-currency-data-generation-expi.patch;apply=no"
 ICEDTEAPATCHES_append_e500v2 = " \
