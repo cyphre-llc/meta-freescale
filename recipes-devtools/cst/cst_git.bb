@@ -2,7 +2,7 @@ SUMMARY = "utility for security boot"
 LICENSE = "BSD"
 
 # TODO: fix license - this file is not a license
-LIC_FILES_CHKSUM = "file://RELEASENOTES;beginline=8;endline=43;md5=5a7b22a2c96b5f94e0498c5f413aa8d3"
+LIC_FILES_CHKSUM = "file://include/common.h;beginline=8;endline=30;md5=573e4049ebb103e1cb3f63bc8aaf00b2"
 
 DEPENDS += "openssl"
 
