@@ -61,6 +61,11 @@ RDEPENDS_${PN}_append_qoriq = "\
     merge-files \
     ${DPAA_PKGS} \
 "
+# NOTE: Remove the conditional pkc-host inclusion and all traces of c29x_pkc
+# DISTRO_FEATURE if pkc-host no longer requires customized cryptodev patches
+RDEPENDS_${PN}_append_qoriq-ppc = "\
+    ${@base_contains('DISTRO_FEATURES', 'c29x_pkc', 'pkc-host', '', d)} \
+"
 RDEPENDS_${PN}_remove_ls102xa ="apptrk"
 RDEPENDS_${PN}_append_e500v2 = " testfloat"
 RDEPENDS_${PN}_append_e6500-64b = " ceetm"
@@ -69,10 +74,7 @@ RDEPENDS_${PN}_append_p1023rdb = " fmc eth-config"
 RDEPENDS_${PN}_append_b4860qds = "${IPC_PKGS}"
 RDEPENDS_${PN}_append_b4420qds = "${IPC_PKGS}"
 
-# NOTE: Remove the conditional pkc-host inclusion and all traces of c29x_pkc
-# DISTRO_FEATURE if pkc-host no longer requires customized cryptodev patches
 RDEPENDS_${PN}_append_p4080ds = " \
-    ${@base_contains('DISTRO_FEATURES', 'c29x_pkc', 'pkc-host', '', d)} \
     skmm-ep \
     skmm-host \
 "
@@ -90,7 +92,6 @@ RDEPENDS_${PN}_append_t1042 = " \
 "
 
 RDEPENDS_${PN}_append_t4240qds = " \
-    ${@base_contains('DISTRO_FEATURES', 'c29x_pkc', 'pkc-host', '', d)} \
     skmm-ep \
     skmm-host \
 "
