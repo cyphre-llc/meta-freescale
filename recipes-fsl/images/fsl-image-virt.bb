@@ -8,7 +8,7 @@ IMAGE_INSTALL += " \
 "
 
 export IMAGE_BASENAME = "fsl-image-virt"
-IMAGE_FSTYPES = "tar.gz ext2.gz.u-boot"
+IMAGE_FSTYPES = "tar.gz ext2.gz ext2.gz.u-boot"
 
 # copy rootfs image into rootfs
 inherit fsl-utils
