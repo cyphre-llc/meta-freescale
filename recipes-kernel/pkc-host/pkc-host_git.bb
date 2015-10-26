@@ -14,7 +14,11 @@ SRCREV = "564f535d596f43eb2901a7ff77bbe529a118c16e"
 
 S = "${WORKDIR}/git"
 
-EXTRA_OEMAKE='KERNEL_DIR="${STAGING_KERNEL_DIR}" PREFIX="${D}"'
+EXTRA_OEMAKE += 'KERNEL_DIR="${STAGING_KERNEL_DIR}" PREFIX="${D}" EXTRA_CFLAGS="--sysroot=${STAGING_DIR_TARGET}"'
+
+do_compile_prepend() {
+    sed -i 's,$(CROSS_COMPILE)gcc,$(CROSS_COMPILE)gcc $(EXTRA_CFLAGS),' ${S}/Makefile
+}
 
 do_install() {
     oe_runmake INSTALL_MOD_PATH="${D}" modules_install
