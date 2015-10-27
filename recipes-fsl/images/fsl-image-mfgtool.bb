@@ -10,7 +10,7 @@ a USB stick or a hard drive."
 LICENSE = "MIT"
 
 IMAGE_INSTALL_append = " \
-    packagegroup-core-ssh-dropbear \
+    packagegroup-core-ssh-openssh \
     packagegroup-fsl-mfgtools \
 "
 
