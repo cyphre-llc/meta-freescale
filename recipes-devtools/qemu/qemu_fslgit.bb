@@ -13,13 +13,14 @@ S = "${WORKDIR}/git"
 
 QEMU_TARGETS_qoriq-ppc = "ppc"
 QEMU_TARGETS_qoriq-arm = "arm"
-PPC_OECONF = '${SDL} --cross-prefix=${TARGET_PREFIX} --disable-werror --disable-vnc --disable-bluez --disable-curl --enable-libusb'
+PPC_OECONF = '${SDL} --cross-prefix=${TARGET_PREFIX} --disable-werror --disable-vnc --disable-bluez --disable-curl'
 EXTRA_OECONF_e5500-64b = "--target-list=ppc64-softmmu ${PPC_OECONF}"
 EXTRA_OECONF_e6500-64b = "--target-list=ppc64-softmmu ${PPC_OECONF}"
 EXTRA_OECONF_e6500 = "--target-list=ppc64-softmmu ${PPC_OECONF}"
 EXTRA_OECONF_e5500 = "--target-list=ppc64-softmmu ${PPC_OECONF}"
 EXTRA_OECONF_e500v2 = "--target-list=ppc-softmmu ${PPC_OECONF}"
 EXTRA_OECONF_e500mc = "--target-list=ppc-softmmu ${PPC_OECONF}"
+PACKAGECONFIG_append = " libusb"
 
 do_configure_prepend() {
     export PKG_CONFIG=${STAGING_DIR_NATIVE}${bindir_native}/pkg-config
