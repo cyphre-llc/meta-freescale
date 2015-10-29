@@ -37,4 +37,5 @@ RDEPENDS_${PN} = " \
 
 RDEPENDS_${PN}_append_qoriq = " \
     valgrind \
+    ncurses-dev \
 "
