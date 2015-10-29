@@ -26,7 +26,6 @@ do_install() {
     install -d ${D}/${bindir}
     cp ${S}/crypto.cfg ${D}/etc/crypto
     cp ${S}/images/pkc-firmware.bin ${D}/etc/crypto
-    cp ${S}/apps/cli/cli ${D}/${bindir}
     cp ${S}/perf/c29x_driver_perf_profile.sh ${D}/${bindir}
 }
 
