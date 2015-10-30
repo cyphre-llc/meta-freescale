@@ -17,6 +17,7 @@ RDEPENDS_${PN} = " \
     e2fsprogs-tune2fs  \
     i2c-tools \
     kmod \
+    kernel-modules \
     libhugetlbfs \
     lmsensors-sensors \
     memtester \
