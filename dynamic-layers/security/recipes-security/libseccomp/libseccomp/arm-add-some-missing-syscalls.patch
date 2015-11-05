@@ -1,0 +1,411 @@
+From 09ee4d714438df9bcb4c3bdb2dead45ab12f381d Mon Sep 17 00:00:00 2001
+From: Bogdan Purcareata <bogdan.purcareata@freescale.com>
+Date: Thu, 7 May 2015 11:02:54 +0000
+Subject: [PATCH] arm: add some missing syscalls
+
+Add the following syscalls to the ARM arch/ABI and update the syscall
+validation script.
+
+ * breakpoint()
+ * cacheflush()
+ * usr26()
+ * usr32()
+ * set_tls()
+
+Reported-by: Purcareata Bogdan <b43198@freescale.com>
+Signed-off-by: Paul Moore <pmoore@redhat.com>
+(backported from master to working-ppc64)
+Signed-off-by: Bogdan Purcareata <bogdan.purcareata@freescale.com>
+---
+ include/seccomp.h.in          | 20 ++++++++++++++++++++
+ src/arch-aarch64-syscalls.c   |  4 ++++
+ src/arch-arm-syscalls.c       |  7 ++++++-
+ src/arch-mips-syscalls.c      |  4 ++++
+ src/arch-mips64-syscalls.c    |  4 ++++
+ src/arch-mips64n32-syscalls.c |  4 ++++
+ src/arch-syscall-validate     | 36 +++++++++++++++++++++++++-----------
+ src/arch-x32-syscalls.c       |  4 ++++
+ src/arch-x86-syscalls.c       |  4 ++++
+ src/arch-x86_64-syscalls.c    |  4 ++++
+ 10 files changed, 79 insertions(+), 12 deletions(-)
+
+diff --git a/include/seccomp.h.in b/include/seccomp.h.in
+index 3af4c2b..c3e7feb 100644
+--- a/include/seccomp.h.in
++++ b/include/seccomp.h.in
+@@ -1469,6 +1469,26 @@ int seccomp_export_bpf(const scmp_filter_ctx ctx, int fd);
+ #define __NR_sys_debug_setcontext	__PNR_sys_debug_setcontext
+ #endif /* __NR_sys_debug_setcontext */
+ 
++#define __PNR_breakpoint	-10182
++#ifndef __NR_breakpoint
++#define __NR_breakpoint		__PNR_breakpoint
++#endif /* __NR_breakpoint */
++
++#define __PNR_set_tls		-10183
++#ifndef __NR_set_tls
++#define __NR_set_tls		__PNR_set_tls
++#endif /* __NR_set_tls */
++
++#define __PNR_usr26		-10184
++#ifndef __NR_usr26
++#define __NR_usr26		__PNR_usr26
++#endif /* __NR_usr26 */
++
++#define __PNR_usr32		-10185
++#ifndef __NR_usr32
++#define __NR_usr32		__PNR_usr32
++#endif /* __NR_usr32 */
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff --git a/src/arch-aarch64-syscalls.c b/src/arch-aarch64-syscalls.c
+index c76dae7..315be10 100644
+--- a/src/arch-aarch64-syscalls.c
++++ b/src/arch-aarch64-syscalls.c
+@@ -46,6 +46,7 @@ const struct arch_syscall_def aarch64_syscall_table[] = { \
+ 	{ "bind", 200 },
+ 	{ "bpf", 280 },
+ 	{ "break", __PNR_break },
++	{ "breakpoint", __PNR_breakpoint },
+ 	{ "brk", 214 },
+ 	{ "cachectl", __PNR_cachectl },
+ 	{ "cacheflush", __PNR_cacheflush },
+@@ -324,6 +325,7 @@ const struct arch_syscall_def aarch64_syscall_table[] = { \
+ 	{ "set_robust_list", 99 },
+ 	{ "set_thread_area", __PNR_set_thread_area },
+ 	{ "set_tid_address", 96 },
++	{ "set_tls", __PNR_set_tls },
+ 	{ "setdomainname", 162 },
+ 	{ "setfsgid", 152 },
+ 	{ "setfsgid32", __PNR_setfsgid32 },
+@@ -424,6 +426,8 @@ const struct arch_syscall_def aarch64_syscall_table[] = { \
+ 	{ "unlinkat", 35 },
+ 	{ "unshare", 97 },
+ 	{ "uselib", __PNR_uselib },
++	{ "usr26", __PNR_usr26 },
++	{ "usr32", __PNR_usr32 },
+ 	{ "ustat", __PNR_ustat },
+ 	{ "utime", __PNR_utime },
+ 	{ "utimensat", 88 },
+diff --git a/src/arch-arm-syscalls.c b/src/arch-arm-syscalls.c
+index b9400a3..12feb3f 100644
+--- a/src/arch-arm-syscalls.c
++++ b/src/arch-arm-syscalls.c
+@@ -27,6 +27,7 @@
+ #include "arch-arm.h"
+ 
+ #define __NR_OABI_SYSCALL_BASE	0x900000
++#define __ARM_NR_BASE		0x0f0000
+ 
+ /* NOTE: we currently only support the ARM EABI, more info at the URL below:
+  *       -> http://wiki.embeddedarm.com/wiki/EABI_vs_OABI */
+@@ -57,9 +58,10 @@ const struct arch_syscall_def arm_syscall_table[] = { \
+ 	{ "bind", (__NR_SYSCALL_BASE + 282) },
+ 	{ "bpf", (__NR_SYSCALL_BASE + 386) },
+ 	{ "break", __PNR_break },
++	{ "breakpoint", (__NR_SYSCALL_BASE + (__ARM_NR_BASE + 1)) },
+ 	{ "brk", (__NR_SYSCALL_BASE + 45) },
+ 	{ "cachectl", __PNR_cachectl },
+-	{ "cacheflush", __PNR_cacheflush },
++	{ "cacheflush", (__NR_SYSCALL_BASE + (__ARM_NR_BASE + 2)) },
+ 	{ "capget", (__NR_SYSCALL_BASE + 184) },
+ 	{ "capset", (__NR_SYSCALL_BASE + 185) },
+ 	{ "chdir", (__NR_SYSCALL_BASE + 12) },
+@@ -335,6 +337,7 @@ const struct arch_syscall_def arm_syscall_table[] = { \
+ 	{ "set_robust_list", (__NR_SYSCALL_BASE + 338) },
+ 	{ "set_thread_area", __PNR_set_thread_area },
+ 	{ "set_tid_address", (__NR_SYSCALL_BASE + 256) },
++	{ "set_tls", (__NR_SYSCALL_BASE + (__ARM_NR_BASE + 5)) },
+ 	{ "setdomainname", (__NR_SYSCALL_BASE + 121) },
+ 	{ "setfsgid", (__NR_SYSCALL_BASE + 139) },
+ 	{ "setfsgid32", (__NR_SYSCALL_BASE + 216) },
+@@ -435,6 +438,8 @@ const struct arch_syscall_def arm_syscall_table[] = { \
+ 	{ "unlinkat", (__NR_SYSCALL_BASE + 328) },
+ 	{ "unshare", (__NR_SYSCALL_BASE + 337) },
+ 	{ "uselib", (__NR_SYSCALL_BASE + 86) },
++	{ "usr26", (__NR_SYSCALL_BASE + (__ARM_NR_BASE + 3)) },
++	{ "usr32", (__NR_SYSCALL_BASE + (__ARM_NR_BASE + 4)) },
+ 	{ "ustat", (__NR_SYSCALL_BASE + 62) },
+ 	{ "utime", (__NR_SYSCALL_BASE + 30) },
+ 	{ "utimensat", (__NR_SYSCALL_BASE + 348) },
+diff --git a/src/arch-mips-syscalls.c b/src/arch-mips-syscalls.c
+index c318aa0..f02988e 100644
+--- a/src/arch-mips-syscalls.c
++++ b/src/arch-mips-syscalls.c
+@@ -50,6 +50,7 @@ const struct arch_syscall_def mips_syscall_table[] = { \
+ 	{ "bind", (__NR_SYSCALL_BASE + 169) },
+ 	{ "bpf", (__NR_SYSCALL_BASE + 355) },
+ 	{ "break", __NR_SYSCALL_BASE + 17 },
++	{ "breakpoint", __PNR_breakpoint },
+ 	{ "brk", (__NR_SYSCALL_BASE + 45) },
+ 	{ "cachectl", (__NR_SYSCALL_BASE + 148) },
+ 	{ "cacheflush", (__NR_SYSCALL_BASE + 147) },
+@@ -328,6 +329,7 @@ const struct arch_syscall_def mips_syscall_table[] = { \
+ 	{ "set_robust_list", (__NR_SYSCALL_BASE + 309) },
+ 	{ "set_thread_area", (__NR_SYSCALL_BASE + 283) },
+ 	{ "set_tid_address", (__NR_SYSCALL_BASE + 252) },
++	{ "set_tls", __PNR_set_tls },
+ 	{ "setdomainname", (__NR_SYSCALL_BASE + 121) },
+ 	{ "setfsgid", (__NR_SYSCALL_BASE + 139) },
+ 	{ "setfsgid32", __PNR_setfsgid32 },
+@@ -428,6 +430,8 @@ const struct arch_syscall_def mips_syscall_table[] = { \
+ 	{ "unlinkat", (__NR_SYSCALL_BASE + 294) },
+ 	{ "unshare", (__NR_SYSCALL_BASE + 303) },
+ 	{ "uselib", (__NR_SYSCALL_BASE + 86) },
++	{ "usr26", __PNR_usr26 },
++	{ "usr32", __PNR_usr32 },
+ 	{ "ustat", (__NR_SYSCALL_BASE + 62) },
+ 	{ "utime", (__NR_SYSCALL_BASE + 30) },
+ 	{ "utimensat", (__NR_SYSCALL_BASE + 316) },
+diff --git a/src/arch-mips64-syscalls.c b/src/arch-mips64-syscalls.c
+index 007a472..7faea23 100644
+--- a/src/arch-mips64-syscalls.c
++++ b/src/arch-mips64-syscalls.c
+@@ -50,6 +50,7 @@ const struct arch_syscall_def mips64_syscall_table[] = { \
+ 	{ "bind", (__NR_SYSCALL_BASE + 48) },
+ 	{ "bpf", (__NR_SYSCALL_BASE + 315) },
+ 	{ "break", __PNR_break },
++	{ "breakpoint", __PNR_breakpoint },
+ 	{ "brk", (__NR_SYSCALL_BASE + 12) },
+ 	{ "cachectl", (__NR_SYSCALL_BASE + 198) },
+ 	{ "cacheflush", (__NR_SYSCALL_BASE + 197) },
+@@ -328,6 +329,7 @@ const struct arch_syscall_def mips64_syscall_table[] = { \
+ 	{ "set_robust_list", (__NR_SYSCALL_BASE + 268) },
+ 	{ "set_thread_area", (__NR_SYSCALL_BASE + 242) },
+ 	{ "set_tid_address", (__NR_SYSCALL_BASE + 212) },
++	{ "set_tls", __PNR_set_tls },
+ 	{ "setdomainname", (__NR_SYSCALL_BASE + 166) },
+ 	{ "setfsgid", (__NR_SYSCALL_BASE + 121) },
+ 	{ "setfsgid32", __PNR_setfsgid32 },
+@@ -428,6 +430,8 @@ const struct arch_syscall_def mips64_syscall_table[] = { \
+ 	{ "unlinkat", (__NR_SYSCALL_BASE + 253) },
+ 	{ "unshare", (__NR_SYSCALL_BASE + 262) },
+ 	{ "uselib", __PNR_uselib },
++	{ "usr26", __PNR_usr26 },
++	{ "usr32", __PNR_usr32 },
+ 	{ "ustat", (__NR_SYSCALL_BASE + 133) },
+ 	{ "utime", (__NR_SYSCALL_BASE + 130) },
+ 	{ "utimensat", (__NR_SYSCALL_BASE + 275) },
+diff --git a/src/arch-mips64n32-syscalls.c b/src/arch-mips64n32-syscalls.c
+index ae1c9b8..18ee476 100644
+--- a/src/arch-mips64n32-syscalls.c
++++ b/src/arch-mips64n32-syscalls.c
+@@ -50,6 +50,7 @@ const struct arch_syscall_def mips64n32_syscall_table[] = { \
+ 	{ "bind", (__NR_SYSCALL_BASE + 48) },
+ 	{ "bpf", (__NR_SYSCALL_BASE + 319) },
+ 	{ "break", __PNR_break },
++	{ "breakpoint", __PNR_breakpoint },
+ 	{ "brk", (__NR_SYSCALL_BASE + 12) },
+ 	{ "cachectl", (__NR_SYSCALL_BASE + 198) },
+ 	{ "cacheflush", (__NR_SYSCALL_BASE + 197) },
+@@ -328,6 +329,7 @@ const struct arch_syscall_def mips64n32_syscall_table[] = { \
+ 	{ "set_robust_list", (__NR_SYSCALL_BASE + 272) },
+ 	{ "set_thread_area", (__NR_SYSCALL_BASE + 246) },
+ 	{ "set_tid_address", (__NR_SYSCALL_BASE + 213) },
++	{ "set_tls", __PNR_set_tls },
+ 	{ "setdomainname", (__NR_SYSCALL_BASE + 166) },
+ 	{ "setfsgid", (__NR_SYSCALL_BASE + 121) },
+ 	{ "setfsgid32", __PNR_setfsgid32 },
+@@ -428,6 +430,8 @@ const struct arch_syscall_def mips64n32_syscall_table[] = { \
+ 	{ "unlinkat", (__NR_SYSCALL_BASE + 257) },
+ 	{ "unshare", (__NR_SYSCALL_BASE + 266) },
+ 	{ "uselib", __PNR_uselib },
++	{ "usr26", __PNR_usr26 },
++	{ "usr32", __PNR_usr32 },
+ 	{ "ustat", (__NR_SYSCALL_BASE + 133) },
+ 	{ "utime", (__NR_SYSCALL_BASE + 130) },
+ 	{ "utimensat", (__NR_SYSCALL_BASE + 279) },
+diff --git a/src/arch-syscall-validate b/src/arch-syscall-validate
+index 595dfef..65bf3c8 100755
+--- a/src/arch-syscall-validate
++++ b/src/arch-syscall-validate
+@@ -147,11 +147,21 @@ function dump_lib_x32() {
+ function dump_sys_arm() {
+ 	# NOTE: arm_sync_file_range() and sync_file_range2() share values
+ 	cat $1/arch/arm/include/uapi/asm/unistd.h | \
+-		grep "^#define __NR_" | sort | \
++		grep "^#define __\(ARM_\)*NR_" | \
+ 		grep -v "^#define __NR_OABI_SYSCALL_BASE" | \
+ 		grep -v "^#define __NR_SYSCALL_BASE" | \
+-		sed -e 's/#define[ \t]\+__NR_\([^ \t]\+\)[ \t]\+(__NR_SYSCALL_BASE[ \t]*+[ \t]*\([0-9]\+\)).*/\1\t\2/' | \
+-		sed -e '/#define __NR_sync_file_range2[ \t]\+__NR_arm_sync_file_range/d'
++		grep -v "^#define __ARM_NR_BASE" | \
++		sed -e 's/#define[ \t]\+__NR_\([^ \t]\+\)[ \t]\+(__NR_SYSCALL_BASE[ \t]*+[ \t]*\([0-9]\+\)).*/\1\t\2/;s/#define[ \t]\+__ARM_NR_\([^ \t]\+\)[ \t]\+(__ARM_NR_BASE[ \t]*+[ \t]*\([0-9]\+\)).*/\1\t983040 + \2/' | \
++		while read line; do \
++			if echo "$line" | grep -q "+"; then \
++				echo "$line" | awk '{ print $1"\t"$2+$4 }'; \
++			else \
++				echo "$line"; \
++			fi; \
++		done | \
++		cat - | \
++		sed -e '/#define __NR_sync_file_range2[ \t]\+__NR_arm_sync_file_range/d' | \
++		sort
+ }
+ 
+ #
+@@ -175,7 +185,7 @@ function dump_lib_arm() {
+ #
+ function dump_sys_aarch64() {
+ 	gcc -E -dM -I$1/include/uapi -D__BITS_PER_LONG=64 $1/include/uapi/asm-generic/unistd.h | \
+-		grep "^#define __NR_" | sort | \
++		grep "^#define __NR_" | \
+ 		sed -e '/__NR_syscalls/d' | \
+ 		sed -e '/__NR_arch_specific_syscall/d' | \
+ 		sed -e 's/#define[ \t]\+__NR_\([^ \t]\+\)[ \t]\+\(.*\)/\1\t\2/' | \
+@@ -191,7 +201,8 @@ function dump_sys_aarch64() {
+ 		sed -e 's/__NR3264_mmap/222/' | \
+ 		sed -e 's/__NR3264_fstat/80/' | \
+ 		sed -e 's/__NR3264_lstat/1039/' | \
+-		sed -e 's/__NR3264_stat/1038/'
++		sed -e 's/__NR3264_stat/1038/' | \
++		sort
+ }
+ 
+ #
+@@ -217,14 +228,15 @@ function dump_sys_mips() {
+ 	#   _MIPS_SIM_NABI32 == 2
+ 	#   _MIPS_SIM_ABI64 == 3
+ 	gcc -E -dM -I$1/arch/mips/include/uapi -D_MIPS_SIM=1 $1/arch/mips/include/uapi/asm/unistd.h | \
+-		grep "^#define __NR_" | sort | \
++		grep "^#define __NR_" | \
+ 		grep -v "^#define __NR_O32_" | \
+ 		grep -v "^#define __NR_N32_" | \
+ 		grep -v "^#define __NR_64_" | \
+ 		grep -v "^#define __NR_Linux" | \
+ 		grep -v "^#define __NR_unused" | \
+ 		grep -v "^#define __NR_reserved" | \
+-		sed -e 's/#define[ \t]\+__NR_\([^ \t]\+\)[ \t]\+(__NR_Linux[ \t]*+[ \t]*\([0-9]\+\)).*/\1\t\2/'
++		sed -e 's/#define[ \t]\+__NR_\([^ \t]\+\)[ \t]\+(__NR_Linux[ \t]*+[ \t]*\([0-9]\+\)).*/\1\t\2/' | \
++		sort
+ }
+ 
+ #
+@@ -250,14 +262,15 @@ function dump_sys_mips64() {
+ 	#   _MIPS_SIM_NABI32 == 2
+ 	#   _MIPS_SIM_ABI64 == 3
+ 	gcc -E -dM -I$1/arch/mips/include/uapi -D_MIPS_SIM=3 $1/arch/mips/include/uapi/asm/unistd.h | \
+-		grep "^#define __NR_" | sort | \
++		grep "^#define __NR_" | \
+ 		grep -v "^#define __NR_O32_" | \
+ 		grep -v "^#define __NR_N32_" | \
+ 		grep -v "^#define __NR_64_" | \
+ 		grep -v "^#define __NR_Linux" | \
+ 		grep -v "^#define __NR_unused" | \
+ 		grep -v "^#define __NR_reserved" | \
+-		sed -e 's/#define[ \t]\+__NR_\([^ \t]\+\)[ \t]\+(__NR_Linux[ \t]*+[ \t]*\([0-9]\+\)).*/\1\t\2/'
++		sed -e 's/#define[ \t]\+__NR_\([^ \t]\+\)[ \t]\+(__NR_Linux[ \t]*+[ \t]*\([0-9]\+\)).*/\1\t\2/' | \
++		sort
+ }
+ 
+ #
+@@ -283,14 +296,15 @@ function dump_sys_mips64n32() {
+ 	#   _MIPS_SIM_NABI32 == 2
+ 	#   _MIPS_SIM_ABI64 == 3
+ 	gcc -E -dM -I$1/arch/mips/include/uapi -D_MIPS_SIM=2 $1/arch/mips/include/uapi/asm/unistd.h | \
+-		grep "^#define __NR_" | sort | \
++		grep "^#define __NR_" | \
+ 		grep -v "^#define __NR_O32_" | \
+ 		grep -v "^#define __NR_N32_" | \
+ 		grep -v "^#define __NR_64_" | \
+ 		grep -v "^#define __NR_Linux" | \
+ 		grep -v "^#define __NR_unused" | \
+ 		grep -v "^#define __NR_reserved" | \
+-		sed -e 's/#define[ \t]\+__NR_\([^ \t]\+\)[ \t]\+(__NR_Linux[ \t]*+[ \t]*\([0-9]\+\)).*/\1\t\2/'
++		sed -e 's/#define[ \t]\+__NR_\([^ \t]\+\)[ \t]\+(__NR_Linux[ \t]*+[ \t]*\([0-9]\+\)).*/\1\t\2/' | \
++		sort
+ }
+ 
+ #
+diff --git a/src/arch-x32-syscalls.c b/src/arch-x32-syscalls.c
+index 578d534..a0b4247 100644
+--- a/src/arch-x32-syscalls.c
++++ b/src/arch-x32-syscalls.c
+@@ -46,6 +46,7 @@ const struct arch_syscall_def x32_syscall_table[] = { \
+ 	{ "bind", (X32_SYSCALL_BIT + 49) },
+ 	{ "bpf", (X32_SYSCALL_BIT + 321) },
+ 	{ "break", __PNR_break },
++	{ "breakpoint", __PNR_breakpoint },
+ 	{ "brk", (X32_SYSCALL_BIT + 12) },
+ 	{ "cachectl", __PNR_cachectl },
+ 	{ "cacheflush", __PNR_cacheflush },
+@@ -324,6 +325,7 @@ const struct arch_syscall_def x32_syscall_table[] = { \
+ 	{ "set_robust_list", (X32_SYSCALL_BIT + 530) },
+ 	{ "set_thread_area", __PNR_set_thread_area },
+ 	{ "set_tid_address", (X32_SYSCALL_BIT + 218) },
++	{ "set_tls", __PNR_set_tls },
+ 	{ "setdomainname", (X32_SYSCALL_BIT + 171) },
+ 	{ "setfsgid", (X32_SYSCALL_BIT + 123) },
+ 	{ "setfsgid32", __PNR_setfsgid32 },
+@@ -424,6 +426,8 @@ const struct arch_syscall_def x32_syscall_table[] = { \
+ 	{ "unlinkat", (X32_SYSCALL_BIT + 263) },
+ 	{ "unshare", (X32_SYSCALL_BIT + 272) },
+ 	{ "uselib", __PNR_uselib },
++	{ "usr26", __PNR_usr26 },
++	{ "usr32", __PNR_usr32 },
+ 	{ "ustat", (X32_SYSCALL_BIT + 136) },
+ 	{ "utime", (X32_SYSCALL_BIT + 132) },
+ 	{ "utimensat", (X32_SYSCALL_BIT + 280) },
+diff --git a/src/arch-x86-syscalls.c b/src/arch-x86-syscalls.c
+index 92343f0..d27a4d1 100644
+--- a/src/arch-x86-syscalls.c
++++ b/src/arch-x86-syscalls.c
+@@ -46,6 +46,7 @@ const struct arch_syscall_def x86_syscall_table[] = { \
+ 	{ "bind", __PNR_bind },
+ 	{ "bpf", 357 },
+ 	{ "break", 17 },
++	{ "breakpoint", __PNR_breakpoint },
+ 	{ "brk", 45 },
+ 	{ "cachectl", __PNR_cachectl },
+ 	{ "cacheflush", __PNR_cacheflush },
+@@ -324,6 +325,7 @@ const struct arch_syscall_def x86_syscall_table[] = { \
+ 	{ "set_robust_list", 311 },
+ 	{ "set_thread_area", 243 },
+ 	{ "set_tid_address", 258 },
++	{ "set_tls", __PNR_set_tls },
+ 	{ "setdomainname", 121 },
+ 	{ "setfsgid", 139 },
+ 	{ "setfsgid32", 216 },
+@@ -424,6 +426,8 @@ const struct arch_syscall_def x86_syscall_table[] = { \
+ 	{ "unlinkat", 301 },
+ 	{ "unshare", 310 },
+ 	{ "uselib", 86 },
++	{ "usr26", __PNR_usr26 },
++	{ "usr32", __PNR_usr32 },
+ 	{ "ustat", 62 },
+ 	{ "utime", 30 },
+ 	{ "utimensat", 320 },
+diff --git a/src/arch-x86_64-syscalls.c b/src/arch-x86_64-syscalls.c
+index d0d4241..cd9eb6d 100644
+--- a/src/arch-x86_64-syscalls.c
++++ b/src/arch-x86_64-syscalls.c
+@@ -46,6 +46,7 @@ const struct arch_syscall_def x86_64_syscall_table[] = { \
+ 	{ "bind", 49 },
+ 	{ "bpf", 321 },
+ 	{ "break", __PNR_break },
++	{ "breakpoint", __PNR_breakpoint },
+ 	{ "brk", 12 },
+ 	{ "cachectl", __PNR_cachectl },
+ 	{ "cacheflush", __PNR_cacheflush },
+@@ -324,6 +325,7 @@ const struct arch_syscall_def x86_64_syscall_table[] = { \
+ 	{ "set_robust_list", 273 },
+ 	{ "set_thread_area", 205 },
+ 	{ "set_tid_address", 218 },
++	{ "set_tls", __PNR_set_tls },
+ 	{ "setdomainname", 171 },
+ 	{ "setfsgid", 123 },
+ 	{ "setfsgid32", __PNR_setfsgid32 },
+@@ -424,6 +426,8 @@ const struct arch_syscall_def x86_64_syscall_table[] = { \
+ 	{ "unlinkat", 263 },
+ 	{ "unshare", 272 },
+ 	{ "uselib", 134 },
++	{ "usr26", __PNR_usr26 },
++	{ "usr32", __PNR_usr32 },
+ 	{ "ustat", 136 },
+ 	{ "utime", 132 },
+ 	{ "utimensat", 280 },
+-- 
+2.1.4
+
