@@ -64,7 +64,7 @@ PROJECT_DIR=${ROOTDIR}/build_${MACHINE}
 
 prompt_message () {
 local i=''
-echo "Welcome to Freescale Community BSP
+echo "Welcome to Freescale QorIQ SDK (Reference Distro)
 
 The Yocto Project has extensive documentation about OE including a
 reference manual which can be found at:
@@ -74,13 +74,6 @@ For more information about OpenEmbedded see their website:
     http://www.openembedded.org/
 
 You can now run 'bitbake <target>'
-
-Common targets are:
-    core-image-minimal
-    meta-toolchain
-    meta-toolchain-sdk
-    adt-installer
-    meta-ide-support
 "
     echo "Targets specific to Freescale targets:"
     for i in `ls $FSLROOTDIR/recipes-*/images/*.bb 2>/dev/null`;do
@@ -107,13 +100,9 @@ usage() {
     ls $FSLROOTDIR/conf/machine/*.conf > /dev/null 2>&1
 
     if [ $? -eq 0 ]; then
-        echo -e "\n    Supported machines
-    i.MX:  `ls $FSLROOTDIR/conf/machine | grep "\.conf" \
-           | egrep "^imx|^twr" | sed s/\.conf//g | xargs echo`
-    QorIQ: `ls $FSLROOTDIR/conf/machine | grep "\.conf" \
+        echo -e "\n    Supported machines:
+    `ls $FSLROOTDIR/conf/machine | grep "\.conf" \
            | egrep -v "^imx|^twr" | sed s/\.conf//g | xargs echo`
-    Extra:  `ls $EXTRAROOTDIR/conf/machine \
-           | grep "\.conf" | sed s/\.conf//g | xargs echo`
 "
     else
         echo "    ERROR: no available machine conf file is found. "
@@ -175,8 +164,7 @@ fi
 
 # Check the machine type specified
 if [ -n "${MACHINE}" ] && \
-    [ -e "$FSLROOTDIR/conf/machine/${MACHINE}.conf" ] || \
-    [ -e "$EXTRAROOTDIR/conf/machine/${MACHINE}.conf" ]; then
+    [ -e "$FSLROOTDIR/conf/machine/${MACHINE}.conf" ]; then
     echo "Configuring for ${MACHINE} ..."
 else
     echo -e "\nThe \$MACHINE you have specified ($MACHINE) is not supported by this build setup."
