@@ -53,7 +53,7 @@ WRAP_TARGET_PREFIX ?= "${TARGET_PREFIX}"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-UBOOT_LOCALVERSION = "${@d.getVar('SDK_VERSION', True).partition(' ')[0]}"
+LOCALVERSION = "+SDKv${@d.getVar('SDK_VERSION', True).partition(' ')[0]}"
 
 USRC ?= ""
 S = '${@base_conditional("USRC", "", "${WORKDIR}/git", "${USRC}", d)}'
