@@ -135,7 +135,7 @@ do_compile_append_qoriq-arm () {
     fi
 }
 
-do_install_append_qoriq-ppc (){
+do_install_append_qoriq (){
     unset i j
     if [ "x${UBOOT_CONFIG}" != "x" ]; then
         for config in ${UBOOT_MACHINE}; do
@@ -152,7 +152,7 @@ do_install_append_qoriq-ppc (){
     fi
 }
 
-do_deploy_append_qoriq-ppc (){
+do_deploy_append_qoriq (){
     unset i j
     if [ "x${UBOOT_CONFIG}" != "x" ]; then
         for config in ${UBOOT_MACHINE}; do
