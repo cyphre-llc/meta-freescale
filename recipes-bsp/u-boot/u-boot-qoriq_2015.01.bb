@@ -26,12 +26,6 @@ SRC_URI = "git://git.freescale.com/ppc/sdk/u-boot.git;nobranch=1 \
     file://0001-u-boot-mpc85xx-u-boot-.lds-remove-_GLOBAL_OFFSET_TAB.patch"
 SRCREV = "6ba8eedbcdc4b063f59a63e6288b938af739e8ad"
 
-SRC_URI_ls102xa = "\
-    git://sw-stash.freescale.net/scm/dnnpi/ls1-uboot.git;branch=LS1-SDK-Rev2.0;protocol=http \
-    file://U-Boot-arm-mmu-Add-missing-volatile-for-reading-SCTLR-register.patch \
-"
-SRCREV_ls102xa = "3281947a7d81a60b55aa381cf99c99a997b8c971"
-
 python () {
     if d.getVar("TCMODE", True) == "external-fsl":
         return
