@@ -39,7 +39,6 @@ RDEPENDS_${PN} = " \
 DPAA_PKGS = " \
     eth-config \
     fmc \
-    qoriq-debug \
     usdpaa \
     usdpaa-apps \
     dpa-offload \
