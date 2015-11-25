@@ -6,6 +6,11 @@ PREFERRED_VERSION_valgrind_e500v2 = "3.8.1+fsl"
 PREFERRED_VERSION_openssl_qoriq-ppc = "1.0.1i"
 PREFERRED_VERSION_hostapd = "2.4"
 
+# When meta-openenbedded layer included, bitbake will complain that
+# multiple providers are available for jpeg (jpeg, libjpeg-turbo)
+PREFERRED_PROVIDER_jpeg ?= "jpeg"
+PREFERRED_PROVIDER_jpeg-native ?= "jpeg-native"
+
 QEMU_TARGETS_append_pn-qemu-native = " ppc64"
 PREFERRED_PROVIDER_virtual/java-initial-native = "cacao-initial-native"
 PREFERRED_PROVIDER_virtual/java-native = "jamvm-native"
