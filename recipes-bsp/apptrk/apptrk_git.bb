@@ -4,11 +4,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=95560debfde180684364319811cc1421"
 
 DEPENDS = "elfutils"
 
-SRC_URI = "git://git.freescale.com/ppc/sdk/apptrk.git;nobranch=1 \
-    file://apptrk-install-create-all-components-of-DEST.patch \
-    file://no-strip.patch \
-"
-SRCREV = "cbed10997c5e2a4aaa004fb0e1efec858bf1bbe1"
+SRC_URI = "git://git.freescale.com/ppc/sdk/apptrk.git;branch=sdk-v1.9.x"
+SRCREV = "4216af328452ed25a557759715a2087986a5a4bd"
 
 EXTRA_OEMAKE_qoriq-arm = 'ARCH=arm'
 
