@@ -8,8 +8,8 @@ DEPENDS += "openssl"
 
 inherit kernel-arch
 
-SRC_URI = "git://git.freescale.com/ppc/sdk/cst.git;branch=master"
-SRCREV = "6f57c86c93cab0f4d0a40d83b685afa6932a6301"
+SRC_URI = "git://git.freescale.com/ppc/sdk/cst.git;branch=sdk-v1.9.x"
+SRCREV = "65f79eb1443211826a58ff225e86b251af5f0e12"
 
 S = "${WORKDIR}/git"
 
