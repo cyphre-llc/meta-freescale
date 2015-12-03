@@ -1,6 +1,7 @@
-IMAGE_FEATURES_qoriq += "ssh-server-openssh"
+require recipes-fsl/images/fsl-image-minimal.bb
 
-IMAGE_INSTALL_qoriq += " \
+IMAGE_FEATURES_append_qoriq = " ssh-server-openssh"
+IMAGE_INSTALL_append_qoriq = " \
     alsa-utils \
     can-utils \
     iproute2 \
@@ -11,4 +12,5 @@ IMAGE_INSTALL_qoriq += " \
     strongswan \
 "
 
+export IMAGE_BASENAME = "core-image-x11"
 IMAGE_FSTYPES_qoriq = "ext2.gz.u-boot"
