@@ -41,8 +41,7 @@ Mailing list:
 
 Source code:
 
-    git://git.yoctoproject.org/meta-freescale
-    http://git.yoctoproject.org/git/meta-freescale
+    https://github.com/Freescale/meta-freescale.git
 
 When creating patches, please use something like:
 
